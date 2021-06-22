@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="4dp"
+    android:layout_marginBottom="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp">
+
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="Item Name"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/locationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/itemName"
+            android:text="Location"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/quantity"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
+            android:ems="10"
+            android:inputType="number"
+            android:layout_toRightOf="@id/times"
+            android:layout_toEndOf="@id/times"/>
+
+        <TextView
+            android:id="@+id/times"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="X"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginStart="135dp" />
+
+        <ImageButton
+            android:id="@+id/upButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/arrow_up_float"
+            android:layout_toRightOf="@id/times"
+            android:layout_marginBottom="15dp"
+            android:layout_toEndOf="@id/times"
+            android:layout_marginLeft="50dp"
+            android:layout_marginStart="50dp" />
+
+        <ImageButton
+            android:id="@+id/downButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/arrow_down_float"
+            android:layout_toRightOf="@id/times"
+            android:layout_marginTop="15dp"
+            android:layout_toEndOf="@id/times"
+            android:layout_marginLeft="50dp"
+            android:layout_marginStart="50dp"/>
+
+        <ImageButton
+            android:id="@+id/checkButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/checkbox_on_background"
+            android:layout_marginLeft="350dp" />
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

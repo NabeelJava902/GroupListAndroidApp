@@ -20,92 +20,16 @@
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
-    <ScrollView
-        android:layout_width="641dp"
-        android:layout_height="600dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
+        android:scrollbars="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="4dp">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="4dp">
-
-                <TextView
-                    android:id="@+id/listName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:text="Item Name"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/locationText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/listName"
-                    android:text="Location"
-                    android:textSize="15sp" />
-
-                <EditText
-                    android:id="@+id/editTextNumber"
-                    android:layout_width="50sp"
-                    android:layout_height="50sp"
-                    android:ems="10"
-                    android:inputType="number"
-                    android:layout_toRightOf="@id/listName"
-                    android:layout_toEndOf="@id/listName"
-                    android:layout_marginLeft="50dp"/>
-
-                <TextView
-                    android:id="@+id/times"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toEndOf="@id/listName"
-                    android:layout_toRightOf="@id/listName"
-                    android:gravity="center"
-                    android:text="X"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-                <ImageButton
-                    android:id="@+id/upButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/arrow_up_float"
-                    android:layout_toRightOf="@id/editTextNumber"
-                    android:layout_marginBottom="15dp"
-                    android:layout_toEndOf="@id/editTextNumber" />
-
-                <ImageButton
-                    android:id="@+id/downButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/arrow_down_float"
-                    android:layout_toRightOf="@id/editTextNumber"
-                    android:layout_marginTop="15dp"
-                    android:layout_toEndOf="@id/editTextNumber"/>
-
-                <ImageButton
-                    android:id="@+id/checkButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/checkbox_on_background"
-                    android:layout_marginLeft="350dp" />
-
-
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
-
-    </ScrollView>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
