@@ -49,29 +49,7 @@
             android:layout_marginStart="135dp" />
 
         <ImageButton
-            android:id="@+id/upButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/arrow_up_float"
-            android:layout_toRightOf="@id/times"
-            android:layout_marginBottom="15dp"
-            android:layout_toEndOf="@id/times"
-            android:layout_marginLeft="50dp"
-            android:layout_marginStart="50dp" />
-
-        <ImageButton
-            android:id="@+id/downButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/arrow_down_float"
-            android:layout_toRightOf="@id/times"
-            android:layout_marginTop="15dp"
-            android:layout_toEndOf="@id/times"
-            android:layout_marginLeft="50dp"
-            android:layout_marginStart="50dp"/>
-
-        <ImageButton
-            android:id="@+id/checkButton"
+            android:id="@+id/completedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@android:drawable/checkbox_on_background"

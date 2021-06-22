@@ -7,13 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageButton enterIDButton,  enterNewListButton;
+    private ImageButton enterIDButton;
+    private Button enterNewListButton;
     private TextView enterListIDText, appNameText;
     private ScrollView preexistingListsView;
 
@@ -23,12 +25,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         enterIDButton = findViewById(R.id.EnterListIDButton);
-        enterNewListButton = findViewById(R.id.EnterListIDButton);
+        enterNewListButton = findViewById(R.id.CreateNewListButton);
         enterListIDText = findViewById(R.id.EnterListIDText);
         appNameText = findViewById(R.id.AppNameText);
         preexistingListsView = findViewById(R.id.ListsView);
 
-        enterIDButton.setOnClickListener(new OnClickListener() {
+        enterNewListButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 //load list items based on id
@@ -42,5 +44,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, com.example.grouplist.ListActivity.class);
         startActivity(intent);
     }
-
 }

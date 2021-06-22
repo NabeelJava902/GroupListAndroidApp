@@ -1,5 +1,7 @@
 package com.example.grouplist;
 
+import android.widget.ImageButton;
+
 public class ListItem {
 
     private String itemName, location, quantity;
@@ -8,6 +10,10 @@ public class ListItem {
         this.itemName = itemName;
         this.location = location;
         this.quantity = "1";
+    }
+
+    public void changeText1(String text){
+        itemName = text;
     }
 
     public String getListName() {
@@ -33,4 +39,5 @@ public class ListItem {
     public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
+
 }
