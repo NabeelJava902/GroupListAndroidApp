@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -36,6 +37,10 @@ public class ListActivity extends AppCompatActivity {
     private EditText newpopup_itemName, newpopup_itemLocation, newpopup_quantity;
     private Button newpopup_cancel, newpopup_save;
 
+    private ImageButton restoreButton1, restoreButton2, restoreButton3, restoreButton4, restoreButton5;
+    private TextView restoreName1, restoreName2, restoreName3, restoreName4, restoreName5;
+    private TextView restoreLocation1, restoreLocation2, restoreLocation3, restoreLocation4, restoreLocation5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +49,7 @@ public class ListActivity extends AppCompatActivity {
         View bottomSheet = findViewById( R.id.bottom_sheet);
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setPeekHeight(100);
+        bottomSheetBehavior.setPeekHeight(120);
 
         createList();
         buildRecyclerView();
@@ -107,6 +112,12 @@ public class ListActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        restoreButton1 = findViewById(R.id.restore_button_1);
+        restoreButton2 = findViewById(R.id.restore_button_2);
+        restoreButton3 = findViewById(R.id.restore_button_3);
+        restoreButton4 = findViewById(R.id.restore_button_4);
+        restoreButton5 = findViewById(R.id.restore_button_5);
     }
 
     public void addItem(String itemName, String location){

@@ -78,8 +78,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void onBindViewHolder(@NonNull RecyclerAdapter.ViewHolder holder, int position) {
         ListItem currentItem = mItemList.get(position);
 
-        holder.mItemName.setText(currentItem.getListName());
-        holder.mItemLocation.setText(currentItem.getLocation());
+        holder.mItemName.setText(currentItem.getItemName());
+        holder.mItemLocation.setText(currentItem.getLocationName());
         holder.mQuantity.setText(currentItem.getQuantity());
     }
 

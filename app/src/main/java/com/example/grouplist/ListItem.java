@@ -16,7 +16,7 @@ public class ListItem {
         itemName = text;
     }
 
-    public String getListName() {
+    public String getItemName() {
         return itemName;
     }
 
@@ -24,7 +24,7 @@ public class ListItem {
         this.itemName = itemName;
     }
 
-    public String getLocation() {
+    public String getLocationName() {
         return location;
     }
 
