@@ -4,40 +4,36 @@ import android.widget.ImageButton;
 
 public class ListItem {
 
-    private String itemName, location, quantity;
+    private String mItemName, mLocation, mQuantity;
 
     public ListItem(String itemName, String location) {
-        this.itemName = itemName;
-        this.location = location;
-        this.quantity = "1";
-    }
-
-    public void changeText1(String text){
-        itemName = text;
+        mItemName = itemName;
+        mLocation = location;
+        mQuantity = "1";
     }
 
     public String getItemName() {
-        return itemName;
+        return mItemName;
     }
 
-    public void setListName(String itemName) {
-        this.itemName = itemName;
+    public void setItemName(String itemName) {
+        mItemName = itemName;
     }
 
     public String getLocationName() {
-        return location;
+        return mLocation;
     }
 
     public void setLocation(String location) {
-        this.location = location;
+        mLocation = location;
     }
 
     public String getQuantity() {
-        return quantity;
+        return mQuantity;
     }
 
     public void setQuantity(String quantity) {
-        this.quantity = quantity;
+        mQuantity = quantity;
     }
 
 }

@@ -37,27 +37,28 @@ public class ListActivity extends AppCompatActivity {
     private EditText newpopup_itemName, newpopup_itemLocation, newpopup_quantity;
     private Button newpopup_cancel, newpopup_save;
 
-    private ImageButton restoreButton1, restoreButton2, restoreButton3, restoreButton4, restoreButton5;
-    private TextView restoreName1, restoreName2, restoreName3, restoreName4, restoreName5;
-    private TextView restoreLocation1, restoreLocation2, restoreLocation3, restoreLocation4, restoreLocation5;
+    private TextView listName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        View bottomSheet = findViewById( R.id.bottom_sheet);
+        setupDialog();
 
+        listName = findViewById(R.id.listName);
+        listName.setText(MainActivity.listName);
+
+        View bottomSheet = findViewById( R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setPeekHeight(120);
 
         createList();
         buildRecyclerView();
         configureButtons();
-
     }
 
-    public void createNewContactDialog(){
+    private void setupDialog(){
         dialogBuilder = new AlertDialog.Builder(this);
         final View popupView = getLayoutInflater().inflate(R.layout.popup, null);
         newpopup_itemName = (EditText) popupView.findViewById(R.id.popup_itemname);
@@ -68,8 +69,13 @@ public class ListActivity extends AppCompatActivity {
 
         dialogBuilder.setView(popupView);
         dialog = dialogBuilder.create();
-        dialog.show();
+    }
 
+    public void createNewDialog(){
+        dialog.show();
+        newpopup_itemName.setText("");
+        newpopup_itemLocation.setText("");
+        newpopup_quantity.setText("");
         newpopup_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,6 +89,43 @@ public class ListActivity extends AppCompatActivity {
                     addItem(newpopup_itemName.getText().toString(), "None");
                 }else{
                     addItem(newpopup_itemName.getText().toString(), newpopup_itemLocation.getText().toString());
+                }
+                mAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+
+        newpopup_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    public void createEditDialog(int position){
+        dialog.show();
+        ListItem currentItem = mList.get(position);
+        newpopup_itemName.setText(currentItem.getItemName());
+        newpopup_itemLocation.setText(currentItem.getLocationName());
+        newpopup_quantity.setText(currentItem.getQuantity());
+        newpopup_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(newpopup_itemName.getText().toString().equals("")){
+                    Context context = getApplicationContext();
+                    CharSequence text = "Enter an item name";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }else{
+                    changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
+                }
+                if(!(newpopup_itemLocation.getText().toString().equals(""))){
+                    changeValue(position, ValueType.ITEM_LOCATION, newpopup_itemLocation.getText().toString());
+                }
+                if(!(newpopup_quantity.getText().toString().equals(""))){
+                    changeValue(position, ValueType.ITEM_QUANTITY, newpopup_quantity.getText().toString());
                 }
                 dialog.dismiss();
             }
@@ -101,7 +144,7 @@ public class ListActivity extends AppCompatActivity {
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createNewContactDialog();
+                createNewDialog();
             }
         });
 
@@ -112,12 +155,6 @@ public class ListActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        restoreButton1 = findViewById(R.id.restore_button_1);
-        restoreButton2 = findViewById(R.id.restore_button_2);
-        restoreButton3 = findViewById(R.id.restore_button_3);
-        restoreButton4 = findViewById(R.id.restore_button_4);
-        restoreButton5 = findViewById(R.id.restore_button_5);
     }
 
     public void addItem(String itemName, String location){
@@ -125,13 +162,20 @@ public class ListActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void removeItem(int position){
-        mList.remove(position);
+    public void changeValue(int position, ValueType valueType, String string){
+        switch (valueType){
+            case ITEM_NAME: mList.get(position).setItemName(string);
+                break;
+            case ITEM_LOCATION: mList.get(position).setLocation(string);
+                break;
+            case ITEM_QUANTITY: mList.get(position).setQuantity(string);
+                break;
+        }
         mAdapter.notifyDataSetChanged();
     }
 
-    public void popup(int position){
-        //TODO bring a popup
+    public void removeItem(int position){
+        mList.remove(position);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -154,7 +198,7 @@ public class ListActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                popup(position);
+                createEditDialog(position);
             }
 
             @Override

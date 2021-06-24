@@ -10,9 +10,9 @@
         android:id="@+id/listName"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginLeft="155dp"
         android:gravity="center"
         android:text="ListName"
+        android:layout_gravity="center|top"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <ImageButton
@@ -31,8 +31,7 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="376dp"
@@ -43,166 +42,17 @@
         android:orientation="vertical"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <TextView
-            android:id="@+id/completed"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bottom_sheet_recycler"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginStart="115dp"
-            android:layout_marginLeft="115dp"
-            android:gravity="center"
-            android:text="Completed Items"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@color/black" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="41dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/restore_name_1"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="" />
-
-            <ImageButton
-                android:id="@+id/restore_button_1"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_autorenew_24"
-                tools:ignore="VectorDrawableCompat" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/restore_location_1"
-            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:layout_marginTop="50dp"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="41dp"
-            android:orientation="horizontal">
+        </androidx.recyclerview.widget.RecyclerView>
 
-
-            <TextView
-                android:id="@+id/restore_name_2"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="" />
-
-            <ImageButton
-                android:id="@+id/restore_button_2"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_autorenew_24"
-                tools:ignore="VectorDrawableCompat" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/restore_location_2"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="41dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/restore_name_3"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="" />
-
-            <ImageButton
-                android:id="@+id/restore_button_3"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_autorenew_24"
-                tools:ignore="VectorDrawableCompat" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/restore_location_3"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="41dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/restore_name_4"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="" />
-
-            <ImageButton
-                android:id="@+id/restore_button_4"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_autorenew_24"
-                tools:ignore="VectorDrawableCompat" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/restore_location_4"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="41dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/restore_name_5"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="" />
-
-            <ImageButton
-                android:id="@+id/restore_button_5"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_autorenew_24"
-                tools:ignore="VectorDrawableCompat" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/restore_location_5"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="" />
-
-    </LinearLayout>
-
-
-
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addItemButton"
@@ -217,4 +67,4 @@
         app:srcCompat="@drawable/icon_plus"
         tools:ignore="RtlHardcoded,VectorDrawableCompat" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
