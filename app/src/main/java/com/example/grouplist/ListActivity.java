@@ -48,7 +48,7 @@ public class ListActivity extends AppCompatActivity {
 
     private DatabaseReference mListRef;
 
-    private ListObject listObject;
+    private ArrayList<ListObject> mAllLists;
 
     private final static String TAG = "MainActivity";
 
@@ -58,24 +58,42 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
 
         setupDialog();
-
-        listName = findViewById(R.id.listName);
-        listName.setText("ListName");
+        initiate();
 
         mListRef = FirebaseDatabase.getInstance().getReference("lists");
+        readFromFirebase();
 
         View bottomSheet = findViewById( R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setPeekHeight(120);
 
-        createList();
         buildRecyclerView();
         configureButtons();
     }
 
-    private void createList(){
+    private void readFromFirebase(){
+        mListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    mAllLists.add(dataSnapshot.getValue(ListObject.class));
+                }
+                listName.setText(mAllLists.get(0).getListName()); //TODO must add feature where certain list is retrieved based on id input
+                mList.addAll(mAllLists.get(0).getItems());
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    private void initiate(){
         mList = new ArrayList<>();
-        mList.add(new ListItem("ItemName", "Location"));
+        mAllLists = new ArrayList<>();
+        listName = findViewById(R.id.listName);
     }
 
     private void setupDialog(){
