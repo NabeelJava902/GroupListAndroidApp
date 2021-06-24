@@ -16,6 +16,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton enterIDButton;
@@ -28,12 +33,20 @@ public class MainActivity extends AppCompatActivity {
     private EditText newpopup_listName;
     private Button newpopup_cancel, newpopup_save;
 
-    public static String listName;
+    private FirebaseDatabase database;
+    private DatabaseReference mRef;
+
+    private ArrayList<ListItem> items;
+    private String listName;
+    private ArrayList<String> members;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        database = FirebaseDatabase.getInstance();
+        mRef = database.getReference("lists");
 
         enterIDButton = findViewById(R.id.EnterListIDButton);
         enterNewListButton = findViewById(R.id.CreateNewListButton);
@@ -54,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
     public void createNewContactDialog(){
         dialogBuilder = new AlertDialog.Builder(this);
         final View popupView = getLayoutInflater().inflate(R.layout.new_list_popup, null);
-        newpopup_listName = (EditText) popupView.findViewById(R.id.enter_list_name);
-        newpopup_save = (Button) popupView.findViewById(R.id.new_list_save);
-        newpopup_cancel = (Button) popupView.findViewById(R.id.new_list_cancel);
+        newpopup_listName = popupView.findViewById(R.id.enter_list_name);
+        newpopup_save = popupView.findViewById(R.id.new_list_save);
+        newpopup_cancel = popupView.findViewById(R.id.new_list_cancel);
 
         dialogBuilder.setView(popupView);
         dialog = dialogBuilder.create();
@@ -73,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
                     toast.show();
                 }else{
                     listName = newpopup_listName.getText().toString();
+                    items = new ArrayList<>();
+                    members = new ArrayList<>();
+                    items.add(new ListItem("BEEPBOOP", "BOPBOP"));
+                    items.add(new ListItem("FJDSLKF", "FLDSKJFLSKD"));
+                    syncToFirebase();
                     openListActivity();
                 }
                 dialog.dismiss();
@@ -85,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+    }
+
+    private void syncToFirebase(){
+        ListObject list = new ListObject(items, listName, members);
+        String id = mRef.push().getKey();
+
+        mRef.child(id).setValue(list);
     }
 
     public void openListActivity(){

@@ -11,8 +11,8 @@
 
     <gradient
         android:startColor="@color/check_mark_background"
-        android:centerColor="@color/teal_200"
-        android:endColor="@color/orange"
+        android:centerColor="@color/white"
+        android:endColor="@color/check_mark_background"
         android:angle="0" />
 
     <padding

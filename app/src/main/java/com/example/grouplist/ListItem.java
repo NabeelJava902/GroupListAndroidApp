@@ -6,10 +6,13 @@ public class ListItem {
 
     private String mItemName, mLocation, mQuantity;
 
+    public ListItem(){}
+
     public ListItem(String itemName, String location) {
         mItemName = itemName;
         mLocation = location;
         mQuantity = "1";
+        //TODO add quantity in constructor parameter
     }
 
     public String getItemName() {

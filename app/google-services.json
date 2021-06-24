@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "199960291089",
+    "project_id": "gl-app-db",
+    "storage_bucket": "gl-app-db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199960291089:android:4486dc47fe3b9e6928ceb0",
+        "android_client_info": {
+          "package_name": "com.example.grouplist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "199960291089-mplefat7vldiu97poei6sb1k88fcesnk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ8MoR4JpWssjCFoskluTern6Ca6VB1Zk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "199960291089-mplefat7vldiu97poei6sb1k88fcesnk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

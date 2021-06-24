@@ -1,5 +1,6 @@
 package com.example.grouplist;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +18,11 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -39,6 +46,12 @@ public class ListActivity extends AppCompatActivity {
 
     private TextView listName;
 
+    private DatabaseReference mListRef;
+
+    private ListObject listObject;
+
+    private final static String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +60,9 @@ public class ListActivity extends AppCompatActivity {
         setupDialog();
 
         listName = findViewById(R.id.listName);
-        listName.setText(MainActivity.listName);
+        listName.setText("ListName");
+
+        mListRef = FirebaseDatabase.getInstance().getReference("lists");
 
         View bottomSheet = findViewById( R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -56,6 +71,11 @@ public class ListActivity extends AppCompatActivity {
         createList();
         buildRecyclerView();
         configureButtons();
+    }
+
+    private void createList(){
+        mList = new ArrayList<>();
+        mList.add(new ListItem("ItemName", "Location"));
     }
 
     private void setupDialog(){
@@ -177,13 +197,6 @@ public class ListActivity extends AppCompatActivity {
     public void removeItem(int position){
         mList.remove(position);
         mAdapter.notifyDataSetChanged();
-    }
-
-    private void createList(){
-        mList = new ArrayList<>();
-        mList.add(new ListItem("Toilet Paper", "Walmart"));
-        mList.add(new ListItem("Cheese", "Walmart"));
-        mList.add(new ListItem("Chicken", "Chicken"));
     }
 
     private void buildRecyclerView() {
