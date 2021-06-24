@@ -30,8 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
-    private EditText newpopup_listName;
+    private EditText newpopup_listName, newpopup_passcode;
     private Button newpopup_cancel, newpopup_save;
+    public static String passcode; //this string must always be updated before changing activity
 
     private FirebaseDatabase database;
     private DatabaseReference mRef;
@@ -53,11 +54,11 @@ public class MainActivity extends AppCompatActivity {
         enterListIDText = findViewById(R.id.EnterListIDText);
         appNameText = findViewById(R.id.AppNameText);
         preexistingListsView = findViewById(R.id.ListsView);
+        newpopup_passcode = findViewById(R.id.passcode);
 
         enterNewListButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                //load list items based on id
                 createNewContactDialog();
                 //animation
             }
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         newpopup_listName = popupView.findViewById(R.id.enter_list_name);
         newpopup_save = popupView.findViewById(R.id.new_list_save);
         newpopup_cancel = popupView.findViewById(R.id.new_list_cancel);
+        newpopup_passcode = popupView.findViewById(R.id.passcode);
 
         dialogBuilder.setView(popupView);
         dialog = dialogBuilder.create();
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         newpopup_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //TODO add if statement to check if the passcode already exists
+                //TODO add firebase data retrieval
                 if(newpopup_listName.getText().toString().equals("")){
                     Context context = getApplicationContext();
                     CharSequence text = "Enter a list name";
@@ -85,12 +89,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
                 }else{
-                    listName = newpopup_listName.getText().toString();
-                    items = new ArrayList<>();
-                    members = new ArrayList<>();
-                    items.add(new ListItem("BEEPBOOP", "BOPBOP"));
-                    items.add(new ListItem("FJDSLKF", "FLDSKJFLSKD"));
-                    syncToFirebase();
+                    updateVariables(newpopup_passcode.getText().toString(),
+                            newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>());
+                    syncToFirebase(passcode);
                     openListActivity();
                 }
                 dialog.dismiss();
@@ -105,8 +106,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void syncToFirebase(){
-        ListObject list = new ListObject(items, listName, members);
+    private void updateVariables(String passcode, String listName, ArrayList<ListItem> items, ArrayList<String> members){
+        MainActivity.passcode = passcode;
+        this.listName = listName;
+        this.items = items;
+        this.members = members;
+        //TODO temporary code below
+        this.items.add(new ListItem("BEEPBOOP", "BOPBOP"));
+        this.items.add(new ListItem("FJDSLKF", "FLDSKJFLSKD"));
+    }
+
+    private void syncToFirebase(String passcode){
+        ListObject list = new ListObject(items, listName, members, passcode);
         String id = mRef.push().getKey();
 
         mRef.child(id).setValue(list);

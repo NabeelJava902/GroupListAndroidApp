@@ -78,8 +78,12 @@ public class ListActivity extends AppCompatActivity {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     mAllLists.add(dataSnapshot.getValue(ListObject.class));
                 }
-                listName.setText(mAllLists.get(0).getListName()); //TODO must add feature where certain list is retrieved based on id input
-                mList.addAll(mAllLists.get(0).getItems());
+                for(int i=0; i<mAllLists.size(); i++){
+                    if (mAllLists.get(i).getPasscode().equals(MainActivity.passcode)){//TODO add error handling when list deleting feature is added
+                        listName.setText(mAllLists.get(i).getListName());
+                        mList.addAll(mAllLists.get(i).getItems());
+                    }
+                }
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -99,11 +103,11 @@ public class ListActivity extends AppCompatActivity {
     private void setupDialog(){
         dialogBuilder = new AlertDialog.Builder(this);
         final View popupView = getLayoutInflater().inflate(R.layout.popup, null);
-        newpopup_itemName = (EditText) popupView.findViewById(R.id.popup_itemname);
-        newpopup_itemLocation = (EditText) popupView.findViewById(R.id.popup_location);
-        newpopup_quantity = (EditText) popupView.findViewById(R.id.popup_quantity);
-        newpopup_save = (Button) popupView.findViewById(R.id.save_button);
-        newpopup_cancel = (Button) popupView.findViewById(R.id.cancel_button);
+        newpopup_itemName = popupView.findViewById(R.id.popup_itemname);
+        newpopup_itemLocation = popupView.findViewById(R.id.popup_location);
+        newpopup_quantity = popupView.findViewById(R.id.popup_quantity);
+        newpopup_save = popupView.findViewById(R.id.save_button);
+        newpopup_cancel = popupView.findViewById(R.id.cancel_button);
 
         dialogBuilder.setView(popupView);
         dialog = dialogBuilder.create();

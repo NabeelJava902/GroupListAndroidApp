@@ -21,26 +21,41 @@
         android:id="@+id/new_list_save"
         android:layout_width="101dp"
         android:layout_height="37dp"
-        android:layout_marginTop="384dp"
+        android:layout_marginTop="76dp"
         android:background="@drawable/button_round"
         android:text="Save"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.206"
+        app:layout_constraintHorizontal_bias="0.216"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/enter_list_name" />
 
     <Button
         android:id="@+id/new_list_cancel"
         android:layout_width="101dp"
         android:layout_height="37dp"
-        android:layout_marginTop="384dp"
+        android:layout_marginTop="76dp"
         android:background="@drawable/button_round"
         android:text="Cancel"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.806"
+        app:layout_constraintHorizontal_bias="0.819"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/enter_list_name" />
+
+    <EditText
+        android:id="@+id/passcode"
+        android:layout_width="187dp"
+        android:layout_height="63dp"
+        android:ems="10"
+        android:hint="Enter new passcode"
+        android:gravity="center"
+        android:inputType="numberPassword"
+        app:layout_constraintBottom_toTopOf="@+id/enter_list_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.738" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

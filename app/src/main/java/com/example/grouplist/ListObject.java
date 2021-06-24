@@ -7,26 +7,27 @@ public class ListObject {
     private ArrayList<ListItem> items;
     private String listName;
     private ArrayList<String> members;
-    private String id;
+    private String passcode;
 
     public ListObject(){}
 
-    public ListObject(ArrayList<ListItem> items, String listName, ArrayList<String> members) {
+    public ListObject(ArrayList<ListItem> items, String listName, ArrayList<String> members, String passcode) {
         this.items = items;
         this.listName = listName;
         this.members = members;
+        this.passcode = passcode;
     }
 
     public ArrayList<ListItem> getItems() {
         return items;
     }
 
-    public String getId() {
-        return id;
+    public String getPasscode() {
+        return passcode;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setPasscode(String passcode) {
+        this.passcode = passcode;
     }
 
     public void setItems(ArrayList<ListItem> items) {
