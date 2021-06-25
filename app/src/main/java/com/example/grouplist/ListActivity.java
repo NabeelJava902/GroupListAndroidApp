@@ -49,8 +49,9 @@ public class ListActivity extends AppCompatActivity {
     private DatabaseReference mListRef;
 
     private ArrayList<ListObject> mAllLists;
+    private ListObject currentList;
 
-    private final static String TAG = "MainActivity";
+    private final static String TAG = "ListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +79,15 @@ public class ListActivity extends AppCompatActivity {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     mAllLists.add(dataSnapshot.getValue(ListObject.class));
                 }
-                for(int i=0; i<mAllLists.size(); i++){
-                    if (mAllLists.get(i).getPasscode().equals(MainActivity.passcode)){//TODO add error handling when list deleting feature is added
-                        listName.setText(mAllLists.get(i).getListName());
-                        mList.addAll(mAllLists.get(i).getItems());
+                for(ListObject listObject : mAllLists){//TODO 6
+                    if (listObject.getRawPasscode().equals(MainActivity.passcode)){//TODO 7
+                        currentList = listObject;
+                        listName.setText(listObject.getListName());
                     }
+                }
+                if(currentList.getItems() != null){
+                    mList.clear();
+                    mList.addAll(currentList.getItems());
                 }
                 mAdapter.notifyDataSetChanged();
             }
@@ -122,11 +127,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(newpopup_itemName.getText().toString().equals("")){
-                    Context context = getApplicationContext();
-                    CharSequence text = "Enter an item name";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                    ActivityHelper.makeToast("Enter an item name", getApplicationContext());
                 }else if(newpopup_itemLocation.getText().toString().equals("")){
                     addItem(newpopup_itemName.getText().toString(), "None");
                 }else{
@@ -194,17 +195,27 @@ public class ListActivity extends AppCompatActivity {
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mList.clear();
+                mAdapter.notifyDataSetChanged();
                 finish();
             }
         });
     }
 
     public void addItem(String itemName, String location){
-        mList.add(new ListItem(itemName, location));
-        mAdapter.notifyDataSetChanged();
+        if(currentList.getItems() == null){
+            currentList.setItems(new ArrayList<>());
+        }
+        currentList.getItems().add(new ListItem(itemName, location));
+        mListRef.child(currentList.getFireBaseID()).setValue(currentList);
     }
 
-    public void changeValue(int position, ValueType valueType, String string){
+    public void removeItem(int position){
+        currentList.getItems().remove(position);
+        mListRef.child(currentList.getFireBaseID()).setValue(currentList);
+    }
+
+    public void changeValue(int position, ValueType valueType, String string){//TODO add firebase reaction
         switch (valueType){
             case ITEM_NAME: mList.get(position).setItemName(string);
                 break;
@@ -216,10 +227,7 @@ public class ListActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void removeItem(int position){
-        mList.remove(position);
-        mAdapter.notifyDataSetChanged();
-    }
+
 
     private void buildRecyclerView() {
         mRecyclerView = findViewById(R.id.recyclerView);

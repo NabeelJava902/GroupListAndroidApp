@@ -50,7 +50,6 @@
         android:ems="10"
         android:hint="Enter new passcode"
         android:gravity="center"
-        android:inputType="numberPassword"
         app:layout_constraintBottom_toTopOf="@+id/enter_list_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

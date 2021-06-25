@@ -7,27 +7,28 @@ public class ListObject {
     private ArrayList<ListItem> items;
     private String listName;
     private ArrayList<String> members;
-    private String passcode;
+    private String rawPasscode;
+    private String fireBaseID;
 
     public ListObject(){}
 
-    public ListObject(ArrayList<ListItem> items, String listName, ArrayList<String> members, String passcode) {
+    public ListObject(ArrayList<ListItem> items, String listName, ArrayList<String> members, String rawPasscode) {
         this.items = items;
         this.listName = listName;
         this.members = members;
-        this.passcode = passcode;
+        this.rawPasscode = rawPasscode;
     }
 
     public ArrayList<ListItem> getItems() {
         return items;
     }
 
-    public String getPasscode() {
-        return passcode;
+    public String getRawPasscode() {
+        return rawPasscode;
     }
 
-    public void setPasscode(String passcode) {
-        this.passcode = passcode;
+    public void setRawPasscode(String rawPasscode) {
+        this.rawPasscode = rawPasscode;
     }
 
     public void setItems(ArrayList<ListItem> items) {
@@ -48,5 +49,13 @@ public class ListObject {
 
     public void setMembers(ArrayList<String> members) {
         this.members = members;
+    }
+
+    public String getFireBaseID() {
+        return fireBaseID;
+    }
+
+    public void setFireBaseID(String fireBaseID) {
+        this.fireBaseID = fireBaseID;
     }
 }

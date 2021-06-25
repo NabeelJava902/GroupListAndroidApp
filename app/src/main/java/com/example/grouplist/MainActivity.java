@@ -1,5 +1,6 @@
 package com.example.grouplist;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +8,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -16,8 +18,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -25,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton enterIDButton;
     private Button enterNewListButton;
-    private TextView enterListIDText, appNameText;
+    private TextView enterListPasscodeText, appNameText;
     private ScrollView preexistingListsView;
 
     private AlertDialog.Builder dialogBuilder;
@@ -33,34 +38,73 @@ public class MainActivity extends AppCompatActivity {
     private EditText newpopup_listName, newpopup_passcode;
     private Button newpopup_cancel, newpopup_save;
     public static String passcode; //this string must always be updated before changing activity
+    //TODO 6
 
-    private FirebaseDatabase database;
     private DatabaseReference mRef;
 
     private ArrayList<ListItem> items;
     private String listName;
     private ArrayList<String> members;
 
+    private ArrayList<ListObject> mAllLists;
+
+    private final static String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        database = FirebaseDatabase.getInstance();
-        mRef = database.getReference("lists");
+        mRef = FirebaseDatabase.getInstance().getReference("lists");
 
         enterIDButton = findViewById(R.id.EnterListIDButton);
         enterNewListButton = findViewById(R.id.CreateNewListButton);
-        enterListIDText = findViewById(R.id.EnterListIDText);
+        enterListPasscodeText = findViewById(R.id.listPasscodeText);
         appNameText = findViewById(R.id.AppNameText);
         preexistingListsView = findViewById(R.id.ListsView);
         newpopup_passcode = findViewById(R.id.passcode);
 
+        mAllLists = new ArrayList<>();
+
+        readFromFirebase();
+
+        configureButtons();
+
+    }
+
+    private void configureButtons(){
         enterNewListButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 createNewContactDialog();
                 //animation
+            }
+        });
+        enterIDButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(ActivityHelper.verifyPasscode(enterListPasscodeText.getText().toString(), mAllLists)){
+                    passcode = mAllLists.get(ActivityHelper.findList(enterListPasscodeText.getText().toString(), mAllLists)).getRawPasscode();//TODO 6
+                    openListActivity();
+                }else{
+                    ActivityHelper.makeToast("Incorrect passcode", getApplicationContext());
+                }
+            }
+        });
+    }
+
+    private void readFromFirebase(){
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    mAllLists.add(dataSnapshot.getValue(ListObject.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
     }
@@ -80,8 +124,7 @@ public class MainActivity extends AppCompatActivity {
         newpopup_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO add if statement to check if the passcode already exists
-                //TODO add firebase data retrieval
+                //TODO 9
                 if(newpopup_listName.getText().toString().equals("")){
                     Context context = getApplicationContext();
                     CharSequence text = "Enter a list name";
@@ -89,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
                 }else{
-                    updateVariables(newpopup_passcode.getText().toString(),
+                    updateVariables(newpopup_passcode.getText().toString(),//TODO 6
                             newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>());
                     syncToFirebase(passcode);
                     openListActivity();
@@ -107,18 +150,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateVariables(String passcode, String listName, ArrayList<ListItem> items, ArrayList<String> members){
-        MainActivity.passcode = passcode;
+        MainActivity.passcode = passcode;//TODO 6
         this.listName = listName;
         this.items = items;
         this.members = members;
-        //TODO temporary code below
-        this.items.add(new ListItem("BEEPBOOP", "BOPBOP"));
-        this.items.add(new ListItem("FJDSLKF", "FLDSKJFLSKD"));
     }
 
     private void syncToFirebase(String passcode){
         ListObject list = new ListObject(items, listName, members, passcode);
         String id = mRef.push().getKey();
+        list.setFireBaseID(id);
 
         mRef.child(id).setValue(list);
     }

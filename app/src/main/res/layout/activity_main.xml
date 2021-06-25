@@ -25,14 +25,14 @@
         android:layout_marginBottom="25dp">
 
         <EditText
-            android:id="@+id/EnterListIDText"
+            android:id="@+id/listPasscodeText"
             android:layout_width="168dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:layout_marginStart="120dp"
             android:layout_marginLeft="120dp"
             android:gravity="center"
-            android:hint="List Password"
+            android:hint="Passcode"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <ImageButton
