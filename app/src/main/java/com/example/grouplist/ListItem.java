@@ -8,11 +8,10 @@ public class ListItem {
 
     public ListItem(){}
 
-    public ListItem(String itemName, String location) {
+    public ListItem(String itemName, String location, String quantity) {
         mItemName = itemName;
         mLocation = location;
-        mQuantity = "1";
-        //TODO add quantity in constructor parameter
+        mQuantity = quantity;
     }
 
     public String getItemName() {

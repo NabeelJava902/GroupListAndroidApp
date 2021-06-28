@@ -18,13 +18,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.grouplist.Auth.AuthConditional;
+import com.example.grouplist.Auth.AuthEncrypt;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog dialog;
     private EditText newpopup_listName, newpopup_passcode;
     private Button newpopup_cancel, newpopup_save;
-    public static String passcode; //this string must always be updated before changing activity
-    //TODO 6
+
+    public static String encryptedPasscode;//this string must always be updated before changing activity
 
     private DatabaseReference mRef;
 
@@ -84,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(ActivityHelper.verifyPasscode(enterListPasscodeText.getText().toString(), mAllLists)){
-                    passcode = mAllLists.get(ActivityHelper.findList(enterListPasscodeText.getText().toString(), mAllLists)).getRawPasscode();//TODO 6
+                    encryptedPasscode = AuthEncrypt.encrypt(enterListPasscodeText.getText().toString());
                     openListActivity();
                 }else{
                     ActivityHelper.makeToast("Incorrect passcode", getApplicationContext());
@@ -124,18 +131,19 @@ public class MainActivity extends AppCompatActivity {
         newpopup_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO 9
-                if(newpopup_listName.getText().toString().equals("")){
-                    Context context = getApplicationContext();
-                    CharSequence text = "Enter a list name";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                AuthConditional.setVariables(newpopup_passcode.getText().toString(), mAllLists);
+                String msg = AuthConditional.getMessage();
+                if(!AuthConditional.doesVerify()) {
+                    ActivityHelper.makeToast(msg, getApplicationContext());
                 }else{
-                    updateVariables(newpopup_passcode.getText().toString(),//TODO 6
-                            newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>());
-                    syncToFirebase(passcode);
-                    openListActivity();
+                    if(newpopup_listName.getText().toString().equals("")){
+                        ActivityHelper.makeToast("Enter a list name", getApplicationContext());
+                    }else{
+                        encryptedPasscode = AuthEncrypt.encrypt(newpopup_passcode.getText().toString());
+                        updateVariables(newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>());
+                        syncToFirebase();
+                        openListActivity();
+                    }
                 }
                 dialog.dismiss();
             }
@@ -149,19 +157,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void updateVariables(String passcode, String listName, ArrayList<ListItem> items, ArrayList<String> members){
-        MainActivity.passcode = passcode;//TODO 6
+    private void updateVariables(String listName, ArrayList<ListItem> items, ArrayList<String> members){
         this.listName = listName;
         this.items = items;
         this.members = members;
     }
 
-    private void syncToFirebase(String passcode){
-        ListObject list = new ListObject(items, listName, members, passcode);
+    private void syncToFirebase(){
+        ListObject list = new ListObject(items, listName, members, encryptedPasscode);
         String id = mRef.push().getKey();
         list.setFireBaseID(id);
 
         mRef.child(id).setValue(list);
+
     }
 
     public void openListActivity(){

@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -46,12 +44,13 @@ public class ListActivity extends AppCompatActivity {
 
     private TextView listName;
 
-    private DatabaseReference mListRef;
-
-    private ArrayList<ListObject> mAllLists;
     private ListObject currentList;
 
-    private final static String TAG = "ListActivity";
+    private final DatabaseReference mListRef = FirebaseDatabase.getInstance().getReference("lists");
+    private ArrayList<ListObject> mAllLists;
+    private static final String TAG = "ListActivity";
+
+    private boolean isNeedIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,6 @@ public class ListActivity extends AppCompatActivity {
         setupDialog();
         initiate();
 
-        mListRef = FirebaseDatabase.getInstance().getReference("lists");
         readFromFirebase();
 
         View bottomSheet = findViewById( R.id.bottom_sheet);
@@ -73,25 +71,29 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void readFromFirebase(){
+        final int[] currentListIndex = new int[1];
         mListRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     mAllLists.add(dataSnapshot.getValue(ListObject.class));
                 }
-                for(ListObject listObject : mAllLists){//TODO 6
-                    if (listObject.getRawPasscode().equals(MainActivity.passcode)){//TODO 7
-                        currentList = listObject;
-                        listName.setText(listObject.getListName());
+                if(isNeedIndex) {
+                    for (int i = 0; i < mAllLists.size(); i++) {
+                        if (mAllLists.get(i).getEncryptedPasscode().equals(MainActivity.encryptedPasscode)) {
+                            currentListIndex[0] = i;
+                            isNeedIndex = false;
+                        }
                     }
                 }
+                currentList = mAllLists.get(currentListIndex[0]);
+                listName.setText(currentList.getListName());
                 if(currentList.getItems() != null){
                     mList.clear();
                     mList.addAll(currentList.getItems());
                 }
                 mAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.w(TAG, "Failed to read value.", error.toException());
@@ -103,6 +105,7 @@ public class ListActivity extends AppCompatActivity {
         mList = new ArrayList<>();
         mAllLists = new ArrayList<>();
         listName = findViewById(R.id.listName);
+        isNeedIndex = true;
     }
 
     private void setupDialog(){
@@ -124,15 +127,26 @@ public class ListActivity extends AppCompatActivity {
         newpopup_itemLocation.setText("");
         newpopup_quantity.setText("");
         newpopup_save.setOnClickListener(new View.OnClickListener() {
+            String locationText, itemText, quantityText;
             @Override
             public void onClick(View view) {
                 if(newpopup_itemName.getText().toString().equals("")){
                     ActivityHelper.makeToast("Enter an item name", getApplicationContext());
-                }else if(newpopup_itemLocation.getText().toString().equals("")){
-                    addItem(newpopup_itemName.getText().toString(), "None");
+                    return;
                 }else{
-                    addItem(newpopup_itemName.getText().toString(), newpopup_itemLocation.getText().toString());
+                    itemText = newpopup_itemName.getText().toString();
                 }
+                if(newpopup_itemLocation.getText().toString().equals("")){
+                    locationText = "None";
+                }else{
+                    locationText = newpopup_itemLocation.getText().toString();
+                }
+                if(newpopup_quantity.getText().toString().equals("")){
+                    quantityText = "1";
+                }else{
+                    quantityText = newpopup_quantity.getText().toString();
+                }
+                addItem(itemText, locationText, quantityText);
                 mAdapter.notifyDataSetChanged();
                 dialog.dismiss();
             }
@@ -156,11 +170,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(newpopup_itemName.getText().toString().equals("")){
-                    Context context = getApplicationContext();
-                    CharSequence text = "Enter an item name";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                    ActivityHelper.makeToast("Enter an item name", getApplicationContext());
                 }else{
                     changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
                 }
@@ -202,32 +212,34 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    public void addItem(String itemName, String location){
+    public void addItem(String itemName, String location, String quantity){
         if(currentList.getItems() == null){
             currentList.setItems(new ArrayList<>());
         }
-        currentList.getItems().add(new ListItem(itemName, location));
+        currentList.getItems().add(new ListItem(itemName, location, quantity));
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
     }
 
     public void removeItem(int position){
         currentList.getItems().remove(position);
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
+        if (currentList.getItems().isEmpty()){
+            mList.clear();
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
-    public void changeValue(int position, ValueType valueType, String string){//TODO add firebase reaction
+    public void changeValue(int position, ValueType valueType, String string){
         switch (valueType){
-            case ITEM_NAME: mList.get(position).setItemName(string);
+            case ITEM_NAME: currentList.getItems().get(position).setItemName(string);
                 break;
-            case ITEM_LOCATION: mList.get(position).setLocation(string);
+            case ITEM_LOCATION: currentList.getItems().get(position).setLocation(string);
                 break;
-            case ITEM_QUANTITY: mList.get(position).setQuantity(string);
+            case ITEM_QUANTITY: currentList.getItems().get(position).setQuantity(string);
                 break;
         }
-        mAdapter.notifyDataSetChanged();
+        mListRef.child(currentList.getFireBaseID()).setValue(currentList);
     }
-
-
 
     private void buildRecyclerView() {
         mRecyclerView = findViewById(R.id.recyclerView);

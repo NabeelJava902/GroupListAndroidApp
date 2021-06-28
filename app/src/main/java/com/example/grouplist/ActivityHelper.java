@@ -3,23 +3,27 @@ package com.example.grouplist;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.example.grouplist.Auth.AuthDecrypt;
+
 import java.util.ArrayList;
 
 public class ActivityHelper {
 
-    public static boolean verifyPasscode(String passcode, ArrayList<ListObject> listObjects){//TODO 6
+    public static boolean verifyPasscode(String passcode, ArrayList<ListObject> listObjects){
         for(ListObject object : listObjects){
-            if(object.getRawPasscode().equals(passcode)){
+            String decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode());
+            if(decryptedPasscode.equals(passcode)){
                 return true;
             }
         }
         return false;
     }
 
-    public static int findList(String passcode, ArrayList<ListObject> listObjects){//TODO 6
+    public static int findList(String passcode, ArrayList<ListObject> listObjects){
         int listIndex = 0;
         for(int i=0; i<listObjects.size(); i++){
-            if(listObjects.get(i).getRawPasscode().equals(passcode)){
+            String decryptedPasscode = AuthDecrypt.decrypt(listObjects.get(i).getEncryptedPasscode());
+            if(decryptedPasscode.equals(passcode)){
                 listIndex = i;
             }
         }

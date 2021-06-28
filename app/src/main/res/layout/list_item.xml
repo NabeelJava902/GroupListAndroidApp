@@ -28,14 +28,15 @@
             android:text="Location"
             android:textSize="15sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/quantity"
             android:layout_width="50sp"
             android:layout_height="50sp"
-            android:ems="10"
-            android:inputType="number"
+            android:layout_toEndOf="@id/times"
             android:layout_toRightOf="@id/times"
-            android:layout_toEndOf="@id/times"/>
+            android:ems="10"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/times"
