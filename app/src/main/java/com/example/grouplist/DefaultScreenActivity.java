@@ -33,7 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class DefaultScreenActivity extends AppCompatActivity {
 
     private ImageButton enterIDButton;
     private Button enterNewListButton;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<ListObject> mAllLists;
 
-    private final static String TAG = "MainActivity";
+    private final static String TAG = "DefaultScreenActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

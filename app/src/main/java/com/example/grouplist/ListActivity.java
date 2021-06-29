@@ -80,7 +80,7 @@ public class ListActivity extends AppCompatActivity {
                 }
                 if(isNeedIndex) {
                     for (int i = 0; i < mAllLists.size(); i++) {
-                        if (mAllLists.get(i).getEncryptedPasscode().equals(MainActivity.encryptedPasscode)) {
+                        if (mAllLists.get(i).getEncryptedPasscode().equals(DefaultScreenActivity.encryptedPasscode)) {
                             currentListIndex[0] = i;
                             isNeedIndex = false;
                         }
