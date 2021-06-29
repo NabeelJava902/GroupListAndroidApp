@@ -1,4 +1,4 @@
-package com.example.grouplist;
+package com.example.grouplist.Objects;
 
 import android.widget.ImageButton;
 

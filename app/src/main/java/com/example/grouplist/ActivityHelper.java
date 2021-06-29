@@ -4,6 +4,8 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.example.grouplist.Auth.AuthDecrypt;
+import com.example.grouplist.Objects.ListObject;
+import com.example.grouplist.Objects.UserObject;
 
 import java.util.ArrayList;
 
@@ -13,6 +15,15 @@ public class ActivityHelper {
         for(ListObject object : listObjects){
             String decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode());
             if(decryptedPasscode.equals(passcode)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean verifyEmail(String email, ArrayList<UserObject> userObjects){
+        for(UserObject userObject : userObjects){
+            if(userObject.getEmail().equals(email)){
                 return true;
             }
         }

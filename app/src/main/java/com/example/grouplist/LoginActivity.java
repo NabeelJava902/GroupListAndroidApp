@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import com.example.grouplist.Objects.UserObject;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -30,6 +31,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -42,11 +51,20 @@ public class LoginActivity extends AppCompatActivity {
 
     private Dialog dialog;
 
+    private DatabaseReference mUserRef;
+
+    private ArrayList<UserObject> mAllUsers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
+
+        mUserRef = FirebaseDatabase.getInstance().getReference("users");
+        mAllUsers= new ArrayList<>();
+
+        readFromFirebase();
 
         mAuth = FirebaseAuth.getInstance();
         createRequest();
@@ -107,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
                             currentUser = mAuth.getCurrentUser();
                             assert currentUser != null;
                             ActivityHelper.makeToast( "Signed in as " + currentUser.getDisplayName(), getApplicationContext());
-                            //updateUI, pass user
+                            syncToFirebase();
                             startDefaultScreenActivity();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -118,6 +136,31 @@ public class LoginActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+
+    private void syncToFirebase(){
+        String email = currentUser.getEmail();
+        //check to see if id is not stored in database
+        if(!ActivityHelper.verifyEmail(email, mAllUsers)){
+            UserObject userObject = new UserObject(currentUser.getDisplayName(), email);
+            mUserRef.child(Objects.requireNonNull(mUserRef.push().getKey())).setValue(userObject);
+        }
+    }
+
+    private void readFromFirebase(){
+        mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    mAllUsers.add(dataSnapshot.getValue(UserObject.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "Failed data retrieval");
+            }
+        });
     }
 
     private void signIn(){

@@ -1,7 +1,7 @@
 package com.example.grouplist.Auth;
 
 import com.example.grouplist.ActivityHelper;
-import com.example.grouplist.ListObject;
+import com.example.grouplist.Objects.ListObject;
 
 import java.util.ArrayList;
 
