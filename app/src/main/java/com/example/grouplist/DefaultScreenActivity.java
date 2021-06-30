@@ -3,6 +3,8 @@ package com.example.grouplist;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import com.example.grouplist.Auth.AuthConditional;
 import com.example.grouplist.Auth.AuthEncrypt;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.ListObject;
+import com.example.grouplist.Objects.UserObject;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +36,6 @@ public class DefaultScreenActivity extends AppCompatActivity {
     private ImageButton enterIDButton;
     private Button enterNewListButton;
     private TextView enterListPasscodeText;
-    private ScrollView preexistingListsView;
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
@@ -41,34 +44,47 @@ public class DefaultScreenActivity extends AppCompatActivity {
 
     public static String encryptedPasscode;//this string must always be updated before changing activity
 
-    private DatabaseReference mRef;
+    private DatabaseReference mListRef;
+    private DatabaseReference mUserRef;
 
     private ArrayList<ListItem> items;
     private String listName;
     private ArrayList<String> members;
 
     private ArrayList<ListObject> mAllLists;
+    private ArrayList<UserObject> mAllUsers;
+    private UserObject currentUser;
+
+    private RecyclerAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private final static String TAG = "DefaultScreenActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_default);
 
-        mRef = FirebaseDatabase.getInstance().getReference("lists");
+        initiate();
+
+        readFromFirebase();
+
+        buildRecyclerView();
+        configureButtons();
+    }
+
+    private void initiate(){
+        mListRef = FirebaseDatabase.getInstance().getReference("lists");
+        mUserRef = FirebaseDatabase.getInstance().getReference("users");
 
         enterIDButton = findViewById(R.id.EnterListIDButton);
         enterNewListButton = findViewById(R.id.CreateNewListButton);
         enterListPasscodeText = findViewById(R.id.listPasscodeText);
-        preexistingListsView = findViewById(R.id.ListsView);
         newpopup_passcode = findViewById(R.id.passcode);
 
         mAllLists = new ArrayList<>();
-
-        readFromFirebase();
-
-        configureButtons();
+        mAllUsers = new ArrayList<>();
     }
 
     private void configureButtons(){
@@ -92,18 +108,35 @@ public class DefaultScreenActivity extends AppCompatActivity {
         });
     }
 
-    private void readFromFirebase(){//TODO get all users list
-        mRef.addValueEventListener(new ValueEventListener() {
+    private void readFromFirebase(){
+        mListRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mAllLists.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     mAllLists.add(dataSnapshot.getValue(ListObject.class));
                 }
+                mAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "Failed to get all lists.", error.toException());
+            }
+        });
+
+        mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    mAllUsers.add(dataSnapshot.getValue(UserObject.class));
+                }
+                currentUser = ActivityHelper.findCurrentUser(mAllUsers, FirebaseAuth.getInstance().getCurrentUser());
+                //TODO filter list view
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "Failed to read value.", error.toException());
+                Log.w(TAG, "Failed to get all users.", error.toException());
             }
         });
     }
@@ -157,14 +190,37 @@ public class DefaultScreenActivity extends AppCompatActivity {
 
     private void syncToFirebase(){
         ListObject list = new ListObject(items, listName, members, encryptedPasscode);
-        String id = mRef.push().getKey();
+        String id = mListRef.push().getKey();
         list.setFireBaseID(id);
 
-        mRef.child(id).setValue(list);
+        mListRef.child(id).setValue(list);
     }
 
     public void openListActivity(){
         Intent intent = new Intent(this, com.example.grouplist.ListActivity.class);
         startActivity(intent);
+    }
+
+    private void buildRecyclerView(){
+        mAdapter = new RecyclerAdapter(null, mAllLists);
+        mRecyclerView = findViewById(R.id.all_lists_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                encryptedPasscode = mAllLists.get(position).getEncryptedPasscode();
+                openListActivity();
+            }
+
+            @Override
+            public void onCompleteClick(int position) {
+                //do nothing
+            }
+        });
     }
 }

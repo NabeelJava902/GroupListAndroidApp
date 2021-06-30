@@ -2,7 +2,7 @@ package com.example.grouplist.Objects;
 
 import java.util.ArrayList;
 
-public class ListObject {
+public class ListObject{
 
     private ArrayList<ListItem> items;
     private String listName;

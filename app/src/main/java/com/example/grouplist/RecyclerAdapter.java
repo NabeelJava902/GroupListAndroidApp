@@ -10,29 +10,85 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grouplist.Objects.ListItem;
+import com.example.grouplist.Objects.ListObject;
 
 import java.util.ArrayList;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+public class RecyclerAdapter extends RecyclerView.Adapter {
 
     private ArrayList<ListItem> mItemList;
+    private ArrayList<ListObject> mAllLists;
     private OnItemClickListener mListener;
+
+    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<ListObject> allLists){
+        mItemList = itemList;
+        mAllLists = allLists;
+    }
 
     public interface OnItemClickListener {
         void onItemClick(int position);
         void onCompleteClick(int position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener){
+    public void setOnItemClickListener(RecyclerAdapter.OnItemClickListener listener){
         mListener = listener;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    @Override
+    public int getItemViewType(int position) {
+        if(mItemList != null){
+            return 0;
+        }else if(mAllLists != null){
+            return 1;
+        }
+        return -1;
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View view;
+
+        if(viewType == 0){
+            view = inflater.inflate(R.layout.list_item, parent, false);
+            return new ItemViewHolder(view, mListener);
+        }else if(viewType == 1){
+            view = inflater.inflate(R.layout.list_select, parent, false);
+            return new ListViewHolder(view, mListener);
+        }
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if(mItemList != null){
+            ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
+            itemViewHolder.mItemName.setText(mItemList.get(position).getItemName());
+            itemViewHolder.mItemLocation.setText(mItemList.get(position).getLocationName());
+            itemViewHolder.mQuantity.setText(mItemList.get(position).getQuantity());
+        }else if(mAllLists != null){
+            ListViewHolder listViewHolder = (ListViewHolder) holder;
+            listViewHolder.mListName.setText(mAllLists.get(position).getListName());
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        if(mItemList != null){
+            return mItemList.size();
+        }else if(mAllLists != null){
+            return mAllLists.size();
+        }
+        return -1;
+    }
+
+    class ItemViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mItemName, mItemLocation, mQuantity;
         public ImageButton mCheckButton;
 
-        public ViewHolder(@NonNull View itemView, OnItemClickListener listener) {
+        public ItemViewHolder(@NonNull View itemView, OnItemClickListener listener) {
             super(itemView);
             mItemName = itemView.findViewById(R.id.itemName);
             mItemLocation = itemView.findViewById(R.id.locationText);
@@ -65,28 +121,25 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
-    public RecyclerAdapter(ArrayList<ListItem> itemList){
-        mItemList = itemList;
-    }
+    class ListViewHolder extends RecyclerView.ViewHolder {
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        return new ViewHolder(v, mListener);
-    }
+        public TextView mListName;
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerAdapter.ViewHolder holder, int position) {
-        ListItem currentItem = mItemList.get(position);
+        public ListViewHolder(@NonNull View itemView, OnItemClickListener listener) {
+            super(itemView);
+            mListName = itemView.findViewById(R.id.update_listname);
 
-        holder.mItemName.setText(currentItem.getItemName());
-        holder.mItemLocation.setText(currentItem.getLocationName());
-        holder.mQuantity.setText(currentItem.getQuantity());
-    }
-
-    @Override
-    public int getItemCount() {
-        return mItemList.size();
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
+        }
     }
 }

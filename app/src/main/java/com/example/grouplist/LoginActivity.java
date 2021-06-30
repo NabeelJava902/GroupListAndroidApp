@@ -127,6 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                             ActivityHelper.makeToast( "Signed in as " + currentUser.getDisplayName(), getApplicationContext());
                             syncToFirebase();
                             startDefaultScreenActivity();
+                            dialog.dismiss();
                         } else {
                             // If sign in fails, display a message to the user.
                             ActivityHelper.makeToast("Failed to sign in", getApplicationContext());

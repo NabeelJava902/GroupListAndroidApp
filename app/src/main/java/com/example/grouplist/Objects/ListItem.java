@@ -2,7 +2,7 @@ package com.example.grouplist.Objects;
 
 import android.widget.ImageButton;
 
-public class ListItem {
+public class ListItem{
 
     private String mItemName, mLocation, mQuantity;
 

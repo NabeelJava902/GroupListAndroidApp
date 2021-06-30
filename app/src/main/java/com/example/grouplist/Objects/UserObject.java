@@ -15,6 +15,14 @@ public class UserObject {
         this.email = email;
     }
 
+    public void addGroup(ListObject list){
+        groups.add(list);
+    }
+
+    public void removeGroup(ListObject list){
+        groups.remove(list);
+    }
+
     public String getEmail() {
         return email;
     }

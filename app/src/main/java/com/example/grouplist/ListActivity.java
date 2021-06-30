@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -243,11 +244,13 @@ public class ListActivity extends AppCompatActivity {
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
     }
 
+    @SuppressLint("ResourceType")
     private void buildRecyclerView() {
+        mAdapter = new RecyclerAdapter(mList, null);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
-        mAdapter = new RecyclerAdapter(mList);
+
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);

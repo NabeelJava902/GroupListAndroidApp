@@ -6,6 +6,7 @@ import android.widget.Toast;
 import com.example.grouplist.Auth.AuthDecrypt;
 import com.example.grouplist.Objects.ListObject;
 import com.example.grouplist.Objects.UserObject;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
@@ -30,15 +31,13 @@ public class ActivityHelper {
         return false;
     }
 
-    public static int findList(String passcode, ArrayList<ListObject> listObjects){
-        int listIndex = 0;
-        for(int i=0; i<listObjects.size(); i++){
-            String decryptedPasscode = AuthDecrypt.decrypt(listObjects.get(i).getEncryptedPasscode());
-            if(decryptedPasscode.equals(passcode)){
-                listIndex = i;
+    public static UserObject findCurrentUser(ArrayList<UserObject> allUsers, FirebaseUser currentUser){
+        for(UserObject user : allUsers){
+            if(user.getEmail().equals(currentUser.getEmail())){
+                return user;
             }
         }
-        return listIndex;
+        return null;
     }
 
     public static void makeToast(String msg, Context context){
