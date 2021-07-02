@@ -220,7 +220,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
     private void buildRecyclerView(){
         if(!hasSetAdapter) {
             hasSetAdapter = true;
-            mAdapter = new RecyclerAdapter(null, currentUser.getGroups());
+            mAdapter = new RecyclerAdapter(null, currentUser.getGroups(), null);
             mRecyclerView = findViewById(R.id.all_lists_view);
             mRecyclerView.setHasFixedSize(true);
             mLayoutManager = new LinearLayoutManager(this);

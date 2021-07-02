@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.UserListObject;
 
@@ -18,11 +19,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
 
     private ArrayList<ListItem> mItemList;
     private ArrayList<UserListObject> mUserLists;
+    private ArrayList<CompletedListItem> mCompletedListItem;
     private OnItemClickListener mListener;
 
-    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<UserListObject> userLists){
+    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<UserListObject> userLists, ArrayList<CompletedListItem> completedListItems) {
         mItemList = itemList;
         mUserLists = userLists;
+        mCompletedListItem = completedListItems;
     }
 
     public interface OnItemClickListener {
@@ -40,6 +43,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
             return 0;
         }else if(mUserLists != null){
             return 1;
+        }else if(mCompletedListItem != null){
+            return 2;
         }
         return -1;
     }
@@ -56,6 +61,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
         }else if(viewType == 1){
             view = inflater.inflate(R.layout.list_select, parent, false);
             return new ListViewHolder(view, mListener);
+        }else if(viewType == 2){
+            view = inflater.inflate(R.layout.completed_list_item, parent, false);
+            return new CompletedListViewHolder(view, mListener);
         }
         return null;
     }
@@ -70,6 +78,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
         }else if(mUserLists != null){
             ListViewHolder listViewHolder = (ListViewHolder) holder;
             listViewHolder.mListName.setText(mUserLists.get(position).getListName());
+        }else if(mCompletedListItem != null){
+            CompletedListViewHolder completedListViewHolder = (CompletedListViewHolder) holder;
+            completedListViewHolder.mStaticListName.setText(mCompletedListItem.get(position).getItemName());
+            completedListViewHolder.mStaticLocation.setText(mCompletedListItem.get(position).getLocationName());
+            completedListViewHolder.mStaticQuantity.setText(mCompletedListItem.get(position).getQuantity());
         }
     }
 
@@ -79,11 +92,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
             return mItemList.size();
         }else if(mUserLists != null){
             return mUserLists.size();
+        }else if(mCompletedListItem != null){
+            return mCompletedListItem.size();
         }
         return -1;
     }
 
-    class ItemViewHolder extends RecyclerView.ViewHolder {
+    static class ItemViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mItemName, mItemLocation, mQuantity;
         public ImageButton mCheckButton;
@@ -121,7 +136,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
         }
     }
 
-    class ListViewHolder extends RecyclerView.ViewHolder {
+    static class ListViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mListName;
 
@@ -136,6 +151,32 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
                         int position = getAdapterPosition();
                         if(position != RecyclerView.NO_POSITION){
                             listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    static class CompletedListViewHolder extends RecyclerView.ViewHolder{
+
+        private TextView mStaticListName, mStaticQuantity, mStaticLocation;
+        private ImageButton mRestoreButton;
+
+        public CompletedListViewHolder(@NonNull View itemView, OnItemClickListener listener) {
+            super(itemView);
+            mStaticListName = itemView.findViewById(R.id.staticItemNameText);
+            mStaticLocation = itemView.findViewById(R.id.staticLocationText);
+            mStaticQuantity = itemView.findViewById(R.id.static_quantity);
+            mRestoreButton = itemView.findViewById(R.id.restoreButton);
+
+            mRestoreButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(listener != null){
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            listener.onCompleteClick(position);
                         }
                     }
                 }

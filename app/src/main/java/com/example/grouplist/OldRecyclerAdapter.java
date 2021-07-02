@@ -15,7 +15,7 @@ import com.example.grouplist.R;
 import java.util.ArrayList;
 
 //no longer using this class
-//because it is an outdated version of
+//because it is an outdated version
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
     private ArrayList<ListItem> mItemList;

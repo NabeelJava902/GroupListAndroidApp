@@ -1,20 +1,17 @@
 package com.example.grouplist;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.ListObject;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -29,27 +26,21 @@ import java.util.ArrayList;
 
 public class ListActivity extends AppCompatActivity {
 
-    private BottomSheetBehavior bottomSheetBehavior;
-
-    private RecyclerView mRecyclerView;
-    private RecyclerAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerViewBuilder itemListBuilder;
+    private RecyclerViewBuilder completedListBuilder;
 
     private ArrayList<ListItem> mList;
+    public static ArrayList<CompletedListItem> mCompletedList;
 
     private FloatingActionButton addItemButton;
     private ImageButton returnButton;
 
-    private AlertDialog.Builder dialogBuilder;
-    private AlertDialog dialog;
-    private EditText newpopup_itemName, newpopup_itemLocation, newpopup_quantity;
-    private Button newpopup_cancel, newpopup_save;
+    private Popup popup;
 
     private TextView listName;
+    private static ListObject currentList;
 
-    private ListObject currentList;
-
-    private final DatabaseReference mListRef = FirebaseDatabase.getInstance().getReference("lists");
+    private static final DatabaseReference mListRef = FirebaseDatabase.getInstance().getReference("lists");
     private ArrayList<ListObject> mAllLists;
     private static final String TAG = "ListActivity";
 
@@ -60,17 +51,20 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        setupDialog();
         initiate();
 
         readFromFirebase();
 
-        View bottomSheet = findViewById( R.id.bottom_sheet);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setPeekHeight(120);
+        configureBottomSheet();
 
         buildRecyclerView();
         configureButtons();
+    }
+
+    private void configureBottomSheet(){
+        @SuppressLint("ResourceType") LinearLayout linearLayout = findViewById(R.id.design_bottom_sheet);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(linearLayout);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void readFromFirebase(){
@@ -95,7 +89,7 @@ public class ListActivity extends AppCompatActivity {
                     mList.clear();
                     mList.addAll(currentList.getItems());
                 }
-                mAdapter.notifyDataSetChanged();
+                notifyAdapter();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -104,95 +98,20 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
+    public void notifyAdapter(){
+        itemListBuilder.getAdapter().notifyDataSetChanged();
+        completedListBuilder.getAdapter().notifyDataSetChanged();
+    }
+
+    @SuppressLint("ResourceType")
     private void initiate(){
         mList = new ArrayList<>();
         mAllLists = new ArrayList<>();
+        mCompletedList = new ArrayList<>();
         listName = findViewById(R.id.listName);
         isNeedIndex = true;
-    }
-
-    private void setupDialog(){
-        dialogBuilder = new AlertDialog.Builder(this);
-        final View popupView = getLayoutInflater().inflate(R.layout.popup, null);
-        newpopup_itemName = popupView.findViewById(R.id.popup_itemname);
-        newpopup_itemLocation = popupView.findViewById(R.id.popup_location);
-        newpopup_quantity = popupView.findViewById(R.id.popup_quantity);
-        newpopup_save = popupView.findViewById(R.id.save_button);
-        newpopup_cancel = popupView.findViewById(R.id.cancel_button);
-
-        dialogBuilder.setView(popupView);
-        dialog = dialogBuilder.create();
-    }
-
-    public void createNewDialog(){
-        dialog.show();
-        newpopup_itemName.setText("");
-        newpopup_itemLocation.setText("");
-        newpopup_quantity.setText("");
-        newpopup_save.setOnClickListener(new View.OnClickListener() {
-            String locationText, itemText, quantityText;
-            @Override
-            public void onClick(View view) {
-                if(newpopup_itemName.getText().toString().equals("")){
-                    ActivityHelper.makeToast("Enter an item name", getApplicationContext());
-                    return;
-                }else{
-                    itemText = newpopup_itemName.getText().toString();
-                }
-                if(newpopup_itemLocation.getText().toString().equals("")){
-                    locationText = "None";
-                }else{
-                    locationText = newpopup_itemLocation.getText().toString();
-                }
-                if(newpopup_quantity.getText().toString().equals("")){
-                    quantityText = "1";
-                }else{
-                    quantityText = newpopup_quantity.getText().toString();
-                }
-                addItem(itemText, locationText, quantityText);
-                mAdapter.notifyDataSetChanged();
-                dialog.dismiss();
-            }
-        });
-
-        newpopup_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-    }
-
-    public void createEditDialog(int position){
-        dialog.show();
-        ListItem currentItem = mList.get(position);
-        newpopup_itemName.setText(currentItem.getItemName());
-        newpopup_itemLocation.setText(currentItem.getLocationName());
-        newpopup_quantity.setText(currentItem.getQuantity());
-        newpopup_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(newpopup_itemName.getText().toString().equals("")){
-                    ActivityHelper.makeToast("Enter an item name", getApplicationContext());
-                }else{
-                    changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
-                }
-                if(!(newpopup_itemLocation.getText().toString().equals(""))){
-                    changeValue(position, ValueType.ITEM_LOCATION, newpopup_itemLocation.getText().toString());
-                }
-                if(!(newpopup_quantity.getText().toString().equals(""))){
-                    changeValue(position, ValueType.ITEM_QUANTITY, newpopup_quantity.getText().toString());
-                }
-                dialog.dismiss();
-            }
-        });
-
-        newpopup_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        popup = new Popup(this, getLayoutInflater().inflate(R.layout.popup, null),
+                getLayoutInflater().inflate(R.layout.assure_dialog, null));
     }
 
     private void configureButtons(){
@@ -200,7 +119,7 @@ public class ListActivity extends AppCompatActivity {
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createNewDialog();
+                popup.createNewDialog();
             }
         });
 
@@ -209,13 +128,13 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mList.clear();
-                mAdapter.notifyDataSetChanged();
+                notifyAdapter();
                 finish();
             }
         });
     }
 
-    public void addItem(String itemName, String location, String quantity){
+    public static void addItem(String itemName, String location, String quantity){
         if(currentList.getItems() == null){
             currentList.setItems(new ArrayList<>());
         }
@@ -224,15 +143,17 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public void removeItem(int position){
+        ListItem currentItem = currentList.getItems().get(position);
+        mCompletedList.add(new CompletedListItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity()));
         currentList.getItems().remove(position);
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
         if (currentList.getItems().isEmpty()){
             mList.clear();
-            mAdapter.notifyDataSetChanged();
+            notifyAdapter();
         }
     }
 
-    public void changeValue(int position, ValueType valueType, String string){
+    public static void changeValue(int position, ValueType valueType, String string){
         switch (valueType){
             case ITEM_NAME: currentList.getItems().get(position).setItemName(string);
                 break;
@@ -244,26 +165,35 @@ public class ListActivity extends AppCompatActivity {
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
     }
 
-    @SuppressLint("ResourceType")
+    @SuppressLint({"ResourceType", "CutPasteId"})
     private void buildRecyclerView() {
-        mAdapter = new RecyclerAdapter(mList, null);
-        mRecyclerView = findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
+        itemListBuilder = new RecyclerViewBuilder(findViewById(R.id.recyclerView),
+                new RecyclerAdapter(mList, null, null), this);
 
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-
-        mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+        itemListBuilder.getAdapter().setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                createEditDialog(position);
+                popup.createEditDialog(position, mList);
             }
 
             @Override
             public void onCompleteClick(int position) {
                 removeItem(position);
+            }
+        });
+
+        completedListBuilder = new RecyclerViewBuilder(findViewById(R.id.bottom_sheet_recycler),
+                new RecyclerAdapter(null, null, mCompletedList), this);
+
+        completedListBuilder.getAdapter().setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                //do nothing
+            }
+
+            @Override
+            public void onCompleteClick(int position) {
+                popup.createAssureDialog(position);
             }
         });
     }
