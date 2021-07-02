@@ -6,7 +6,8 @@ public class UserObject {
 
     private String email;
     private String fullName;
-    private ArrayList<ListObject> groups;
+    private String firebaseID;
+    private ArrayList<UserListObject> groups;
 
     private UserObject(){}
 
@@ -15,11 +16,33 @@ public class UserObject {
         this.email = email;
     }
 
-    public void addGroup(ListObject list){
+    public String getFirebaseID() {
+        return firebaseID;
+    }
+
+    public void setFirebaseID(String firebaseID) {
+        this.firebaseID = firebaseID;
+    }
+
+    public boolean hasJoinedGroup(String firebaseID){
+        if(groups != null){
+            for (UserListObject group : groups) {
+                if (group.getFirebaseID().equals(firebaseID)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void addGroup(UserListObject list){
+        if(groups == null){
+            groups = new ArrayList<>();
+        }
         groups.add(list);
     }
 
-    public void removeGroup(ListObject list){
+    public void removeGroup(UserListObject list){
         groups.remove(list);
     }
 
@@ -39,11 +62,14 @@ public class UserObject {
         this.fullName = fullName;
     }
 
-    public ArrayList<ListObject> getGroups() {
-        return groups;
+    public ArrayList<UserListObject> getGroups() {
+        if(groups == null){
+            groups = new ArrayList<>();
+        }
+        return (groups == null) ? null:groups;
     }
 
-    public void setGroups(ArrayList<ListObject> groups) {
+    public void setGroups(ArrayList<UserListObject> groups) {
         this.groups = groups;
     }
 }

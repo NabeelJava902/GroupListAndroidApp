@@ -143,8 +143,11 @@ public class LoginActivity extends AppCompatActivity {
         String email = currentUser.getEmail();
         //check to see if id is not stored in database
         if(!ActivityHelper.verifyEmail(email, mAllUsers)){
+            String id = mUserRef.push().getKey();
             UserObject userObject = new UserObject(currentUser.getDisplayName(), email);
-            mUserRef.child(Objects.requireNonNull(mUserRef.push().getKey())).setValue(userObject);
+            userObject.setFirebaseID(id);
+            assert id != null;
+            mUserRef.child(id).setValue(userObject);
         }
     }
 

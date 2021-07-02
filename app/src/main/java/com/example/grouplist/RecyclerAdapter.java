@@ -10,19 +10,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grouplist.Objects.ListItem;
-import com.example.grouplist.Objects.ListObject;
+import com.example.grouplist.Objects.UserListObject;
 
 import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter {
 
     private ArrayList<ListItem> mItemList;
-    private ArrayList<ListObject> mAllLists;
+    private ArrayList<UserListObject> mUserLists;
     private OnItemClickListener mListener;
 
-    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<ListObject> allLists){
+    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<UserListObject> userLists){
         mItemList = itemList;
-        mAllLists = allLists;
+        mUserLists = userLists;
     }
 
     public interface OnItemClickListener {
@@ -38,7 +38,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         if(mItemList != null){
             return 0;
-        }else if(mAllLists != null){
+        }else if(mUserLists != null){
             return 1;
         }
         return -1;
@@ -67,9 +67,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
             itemViewHolder.mItemName.setText(mItemList.get(position).getItemName());
             itemViewHolder.mItemLocation.setText(mItemList.get(position).getLocationName());
             itemViewHolder.mQuantity.setText(mItemList.get(position).getQuantity());
-        }else if(mAllLists != null){
+        }else if(mUserLists != null){
             ListViewHolder listViewHolder = (ListViewHolder) holder;
-            listViewHolder.mListName.setText(mAllLists.get(position).getListName());
+            listViewHolder.mListName.setText(mUserLists.get(position).getListName());
         }
     }
 
@@ -77,8 +77,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
     public int getItemCount() {
         if(mItemList != null){
             return mItemList.size();
-        }else if(mAllLists != null){
-            return mAllLists.size();
+        }else if(mUserLists != null){
+            return mUserLists.size();
         }
         return -1;
     }

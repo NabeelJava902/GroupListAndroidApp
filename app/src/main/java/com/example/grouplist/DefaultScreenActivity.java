@@ -21,6 +21,7 @@ import com.example.grouplist.Auth.AuthConditional;
 import com.example.grouplist.Auth.AuthEncrypt;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.ListObject;
+import com.example.grouplist.Objects.UserListObject;
 import com.example.grouplist.Objects.UserObject;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 
@@ -59,6 +61,8 @@ public class DefaultScreenActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private boolean hasSetAdapter = false;
+
     private final static String TAG = "DefaultScreenActivity";
 
     @Override
@@ -70,7 +74,6 @@ public class DefaultScreenActivity extends AppCompatActivity {
 
         readFromFirebase();
 
-        buildRecyclerView();
         configureButtons();
     }
 
@@ -98,9 +101,17 @@ public class DefaultScreenActivity extends AppCompatActivity {
         enterIDButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(ActivityHelper.verifyPasscode(enterListPasscodeText.getText().toString(), mAllLists)){
-                    encryptedPasscode = AuthEncrypt.encrypt(enterListPasscodeText.getText().toString());
-                    openListActivity();
+                String passcode = enterListPasscodeText.getText().toString();
+                if(ActivityHelper.verifyPasscode(passcode, mAllLists)){
+                    encryptedPasscode = AuthEncrypt.encrypt(passcode);
+                    ListObject currentList = ActivityHelper.findList(passcode, mAllLists);
+                    if(!currentUser.hasJoinedGroup(currentList.getFireBaseID())){
+                        currentUser.addGroup(new UserListObject(ActivityHelper.getNameFromPasscode(passcode, mAllLists), encryptedPasscode, currentList.getFireBaseID()));
+                        mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
+                        openListActivity();
+                    }else{
+                        ActivityHelper.makeToast("Already joined this group", getApplicationContext());
+                    }
                 }else{
                     ActivityHelper.makeToast("Incorrect passcode", getApplicationContext());
                 }
@@ -116,7 +127,6 @@ public class DefaultScreenActivity extends AppCompatActivity {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     mAllLists.add(dataSnapshot.getValue(ListObject.class));
                 }
-                mAdapter.notifyDataSetChanged();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -124,14 +134,16 @@ public class DefaultScreenActivity extends AppCompatActivity {
             }
         });
 
-        mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        mUserRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mAllUsers.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     mAllUsers.add(dataSnapshot.getValue(UserObject.class));
                 }
                 currentUser = ActivityHelper.findCurrentUser(mAllUsers, FirebaseAuth.getInstance().getCurrentUser());
-                //TODO filter list view
+                buildRecyclerView();
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -193,7 +205,11 @@ public class DefaultScreenActivity extends AppCompatActivity {
         String id = mListRef.push().getKey();
         list.setFireBaseID(id);
 
+        assert id != null;
         mListRef.child(id).setValue(list);
+
+        currentUser.addGroup(new UserListObject(listName, encryptedPasscode, id));
+        mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
     }
 
     public void openListActivity(){
@@ -202,25 +218,28 @@ public class DefaultScreenActivity extends AppCompatActivity {
     }
 
     private void buildRecyclerView(){
-        mAdapter = new RecyclerAdapter(null, mAllLists);
-        mRecyclerView = findViewById(R.id.all_lists_view);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
+        if(!hasSetAdapter) {
+            hasSetAdapter = true;
+            mAdapter = new RecyclerAdapter(null, currentUser.getGroups());
+            mRecyclerView = findViewById(R.id.all_lists_view);
+            mRecyclerView.setHasFixedSize(true);
+            mLayoutManager = new LinearLayoutManager(this);
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                encryptedPasscode = mAllLists.get(position).getEncryptedPasscode();
-                openListActivity();
-            }
+            mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    encryptedPasscode = currentUser.getGroups().get(position).getEncryptedPasscode();
+                    openListActivity();
+                }
 
-            @Override
-            public void onCompleteClick(int position) {
-                //do nothing
-            }
-        });
+                @Override
+                public void onCompleteClick(int position) {
+                    //do nothing
+                }
+            });
+        }
     }
 }
