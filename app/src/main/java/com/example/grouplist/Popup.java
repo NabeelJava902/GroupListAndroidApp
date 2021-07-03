@@ -17,22 +17,23 @@ import static com.example.grouplist.ListActivity.mCompletedList;
 
 public class Popup {
 
-    private AlertDialog.Builder dialogBuilder;
-    private AlertDialog dialog;
+    private AlertDialog itemDialog, assureDialog;
     private EditText newpopup_itemName, newpopup_itemLocation, newpopup_quantity;
     private Button newpopup_cancel, newpopup_save, yes_button, no_button;
 
-    private Context mContext;
-    private View mPopup, mAssurePopup;
+    private final Context mContext;
+    private final View mPopup, mAssurePopup;
 
     public Popup(Context context, View popup, View assurePopoup){
         mContext = context;
         mPopup = popup;
         mAssurePopup = assurePopoup;
+        setupItemDialog();
+        setupAssureDialog();
     }
 
-    private void setupDialog1(){
-        dialogBuilder = new AlertDialog.Builder(mContext);
+    private void setupItemDialog(){
+        AlertDialog.Builder itemDialogBuilder = new AlertDialog.Builder(mContext);
         final View popupView = mPopup;
         newpopup_itemName = popupView.findViewById(R.id.popup_itemname);
         newpopup_itemLocation = popupView.findViewById(R.id.popup_location);
@@ -40,44 +41,34 @@ public class Popup {
         newpopup_save = popupView.findViewById(R.id.save_button);
         newpopup_cancel = popupView.findViewById(R.id.cancel_button);
 
-        dialogBuilder.setView(popupView);
-        dialog = dialogBuilder.create();
-        dialog.show();
+        itemDialogBuilder.setView(popupView);
+        itemDialog = itemDialogBuilder.create();
     }
 
-    private void setupDialog2(){
-        dialogBuilder = new AlertDialog.Builder(mContext);
+    private void setupAssureDialog(){
+        AlertDialog.Builder assureDialogBuilder = new AlertDialog.Builder(mContext);
         final View popupView = mAssurePopup;
         yes_button = popupView.findViewById(R.id.yes);
         no_button = popupView.findViewById(R.id.no);
 
-        dialogBuilder.setView(popupView);
-        dialog = dialogBuilder.create();
-        dialog.show();
+        assureDialogBuilder.setView(popupView);
+        assureDialog = assureDialogBuilder.create();
     }
 
     public void createAssureDialog(int position){
-        setupDialog2();
-        yes_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CompletedListItem currentItem = mCompletedList.get(position);
-                mCompletedList.remove(currentItem);
-                addItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity());
-                dialog.dismiss();
-            }
+        assureDialog.show();
+        yes_button.setOnClickListener(view -> {
+            CompletedListItem currentItem = mCompletedList.get(position);
+            mCompletedList.remove(currentItem);
+            addItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity());
+            assureDialog.dismiss();
         });
 
-        no_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        no_button.setOnClickListener(view -> assureDialog.dismiss());
     }
 
     public void createNewDialog(){
-        setupDialog1();
+        itemDialog.show();
         newpopup_itemName.setText("");
         newpopup_itemLocation.setText("");
         newpopup_quantity.setText("");
@@ -102,47 +93,34 @@ public class Popup {
                     quantityText = newpopup_quantity.getText().toString();
                 }
                 addItem(itemText, locationText, quantityText);
-                dialog.dismiss();
+                itemDialog.dismiss();
             }
         });
 
-        newpopup_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        newpopup_cancel.setOnClickListener(view -> itemDialog.dismiss());
     }
 
     public void createEditDialog(int position, ArrayList<ListItem> mList){
-        setupDialog1();
+        itemDialog.show();
         ListItem currentItem = mList.get(position);
         newpopup_itemName.setText(currentItem.getItemName());
         newpopup_itemLocation.setText(currentItem.getLocationName());
         newpopup_quantity.setText(currentItem.getQuantity());
-        newpopup_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(newpopup_itemName.getText().toString().equals("")){
-                    ActivityHelper.makeToast("Enter an item name", mContext);
-                }else{
-                    changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
-                }
-                if(!(newpopup_itemLocation.getText().toString().equals(""))){
-                    changeValue(position, ValueType.ITEM_LOCATION, newpopup_itemLocation.getText().toString());
-                }
-                if(!(newpopup_quantity.getText().toString().equals(""))){
-                    changeValue(position, ValueType.ITEM_QUANTITY, newpopup_quantity.getText().toString());
-                }
-                dialog.dismiss();
+        newpopup_save.setOnClickListener(view -> {
+            if(newpopup_itemName.getText().toString().equals("")){
+                ActivityHelper.makeToast("Enter an item name", mContext);
+            }else{
+                changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
             }
+            if(!(newpopup_itemLocation.getText().toString().equals(""))){
+                changeValue(position, ValueType.ITEM_LOCATION, newpopup_itemLocation.getText().toString());
+            }
+            if(!(newpopup_quantity.getText().toString().equals(""))){
+                changeValue(position, ValueType.ITEM_QUANTITY, newpopup_quantity.getText().toString());
+            }
+            itemDialog.dismiss();
         });
 
-        newpopup_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        newpopup_cancel.setOnClickListener(view -> itemDialog.dismiss());
     }
 }
