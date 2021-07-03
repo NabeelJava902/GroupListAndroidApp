@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class ListObject{
 
     private ArrayList<ListItem> items;
+    private ArrayList<CompletedListItem> completedListItems;
     private String listName;
     private ArrayList<String> members;
     private String encryptedPasscode;
@@ -12,10 +13,11 @@ public class ListObject{
 
     public ListObject(){}
 
-    public ListObject(ArrayList<ListItem> items, String listName, ArrayList<String> members, String encryptedPasscode) {
+    public ListObject(ArrayList<ListItem> items, String listName, ArrayList<String> members, ArrayList<CompletedListItem> completedListItems, String encryptedPasscode) {
         this.items = items;
         this.listName = listName;
         this.members = members;
+        this.completedListItems = completedListItems;
         this.encryptedPasscode = encryptedPasscode;
     }
 
@@ -57,5 +59,13 @@ public class ListObject{
 
     public void setEncryptedPasscode(String encryptedPasscode) {
         this.encryptedPasscode = encryptedPasscode;
+    }
+
+    public ArrayList<CompletedListItem> getCompletedListItems() {
+        return completedListItems;
+    }
+
+    public void setCompletedListItems(ArrayList<CompletedListItem> completedListItems) {
+        this.completedListItems = completedListItems;
     }
 }

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.grouplist.Auth.AuthConditional;
 import com.example.grouplist.Auth.AuthEncrypt;
+import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.ListObject;
 import com.example.grouplist.Objects.UserListObject;
@@ -50,6 +51,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
     private DatabaseReference mUserRef;
 
     private ArrayList<ListItem> items;
+    private ArrayList<CompletedListItem> completedListItems;
     private String listName;
     private ArrayList<String> members;
 
@@ -91,30 +93,24 @@ public class DefaultScreenActivity extends AppCompatActivity {
     }
 
     private void configureButtons(){
-        enterNewListButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createNewContactDialog();
-                //animation
-            }
+        enterNewListButton.setOnClickListener(view -> {
+            createNewContactDialog();
+            //animation
         });
-        enterIDButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String passcode = enterListPasscodeText.getText().toString();
-                if(ActivityHelper.verifyPasscode(passcode, mAllLists)){
-                    encryptedPasscode = AuthEncrypt.encrypt(passcode);
-                    ListObject currentList = ActivityHelper.findList(passcode, mAllLists);
-                    if(!currentUser.hasJoinedGroup(currentList.getFireBaseID())){
-                        currentUser.addGroup(new UserListObject(ActivityHelper.getNameFromPasscode(passcode, mAllLists), encryptedPasscode, currentList.getFireBaseID()));
-                        mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
-                        openListActivity();
-                    }else{
-                        ActivityHelper.makeToast("Already joined this group", getApplicationContext());
-                    }
+        enterIDButton.setOnClickListener(view -> {
+            String passcode = enterListPasscodeText.getText().toString();
+            if(ActivityHelper.verifyPasscode(passcode, mAllLists)){
+                encryptedPasscode = AuthEncrypt.encrypt(passcode);
+                ListObject currentList = ActivityHelper.findList(passcode, mAllLists);
+                if(!currentUser.hasJoinedGroup(currentList.getFireBaseID())){
+                    currentUser.addGroup(new UserListObject(ActivityHelper.getNameFromPasscode(passcode, mAllLists), encryptedPasscode, currentList.getFireBaseID()));
+                    mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
+                    openListActivity();
                 }else{
-                    ActivityHelper.makeToast("Incorrect passcode", getApplicationContext());
+                    ActivityHelper.makeToast("Already joined this group", getApplicationContext());
                 }
+            }else{
+                ActivityHelper.makeToast("Incorrect passcode", getApplicationContext());
             }
         });
     }
@@ -165,43 +161,36 @@ public class DefaultScreenActivity extends AppCompatActivity {
         dialog = dialogBuilder.create();
         dialog.show();
 
-        newpopup_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AuthConditional.setVariables(newpopup_passcode.getText().toString(), mAllLists);
-                String msg = AuthConditional.getMessage();
-                if(!AuthConditional.doesVerify()) {
-                    ActivityHelper.makeToast(msg, getApplicationContext());
+        newpopup_save.setOnClickListener(view -> {
+            AuthConditional.setVariables(newpopup_passcode.getText().toString(), mAllLists);
+            String msg = AuthConditional.getMessage();
+            if(!AuthConditional.doesVerify()) {
+                ActivityHelper.makeToast(msg, getApplicationContext());
+            }else{
+                if(newpopup_listName.getText().toString().equals("")){
+                    ActivityHelper.makeToast("Enter a list name", getApplicationContext());
                 }else{
-                    if(newpopup_listName.getText().toString().equals("")){
-                        ActivityHelper.makeToast("Enter a list name", getApplicationContext());
-                    }else{
-                        encryptedPasscode = AuthEncrypt.encrypt(newpopup_passcode.getText().toString());
-                        updateVariables(newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>());
-                        syncToFirebase();
-                        openListActivity();
-                    }
+                    encryptedPasscode = AuthEncrypt.encrypt(newpopup_passcode.getText().toString());
+                    updateVariables(newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+                    syncToFirebase();
+                    openListActivity();
                 }
-                dialog.dismiss();
             }
+            dialog.dismiss();
         });
 
-        newpopup_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        newpopup_cancel.setOnClickListener(view -> dialog.dismiss());
     }
 
-    private void updateVariables(String listName, ArrayList<ListItem> items, ArrayList<String> members){
+    private void updateVariables(String listName, ArrayList<ListItem> items, ArrayList<String> members, ArrayList<CompletedListItem> completedListItems){
         this.listName = listName;
         this.items = items;
         this.members = members;
+        this.completedListItems = completedListItems;
     }
 
     private void syncToFirebase(){
-        ListObject list = new ListObject(items, listName, members, encryptedPasscode);
+        ListObject list = new ListObject(items, listName, members, completedListItems, encryptedPasscode);
         String id = mListRef.push().getKey();
         list.setFireBaseID(id);
 
