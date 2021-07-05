@@ -1,9 +1,12 @@
 package com.example.grouplist;
 
 import android.content.Context;
+import android.os.Build;
 import android.widget.Toast;
 
-import com.example.grouplist.Auth.AuthDecrypt;
+import androidx.annotation.RequiresApi;
+
+import com.example.grouplist.Auth.AES;
 import com.example.grouplist.Objects.ListObject;
 import com.example.grouplist.Objects.UserObject;
 import com.google.firebase.auth.FirebaseUser;
@@ -12,31 +15,47 @@ import java.util.ArrayList;
 
 public class ActivityHelper {
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static boolean verifyPasscode(String passcode, ArrayList<ListObject> listObjects){
         for(ListObject object : listObjects){
-            byte[] decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode().getBytes());
-            if(new String(decryptedPasscode).equals(passcode)){
+            String decryptedPasscode = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                decryptedPasscode = AES.decrypt(object.getEncryptedPasscode());
+            }
+            //TODO auth decrypt returning null
+            assert decryptedPasscode != null;
+            if(decryptedPasscode.equals(passcode)){
                 return true;
             }
         }
         return false;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String getNameFromPasscode(String passcode, ArrayList<ListObject> mAllLists){
         for(ListObject object : mAllLists){
-            byte[] decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode().getBytes());
-            if(new String(decryptedPasscode).equals(passcode)){
+            String decryptedPasscode = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                decryptedPasscode = AES.decrypt(object.getEncryptedPasscode());
+            }
+            assert decryptedPasscode != null;
+            if(decryptedPasscode.equals(passcode)){
                 return object.getListName();
             }
         }
         return null;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static ListObject findList(String passcode, ArrayList<ListObject> listObjects){
         ListObject targList = null;
         for(ListObject object : listObjects){
-            byte[] decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode().getBytes());
-            if(new String(decryptedPasscode).equals(passcode)){
+            String decryptedPasscode = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                decryptedPasscode = AES.decrypt(object.getEncryptedPasscode());
+            }
+            assert decryptedPasscode != null;
+            if(decryptedPasscode.equals(passcode)){
                 targList = object;
             }
         }
