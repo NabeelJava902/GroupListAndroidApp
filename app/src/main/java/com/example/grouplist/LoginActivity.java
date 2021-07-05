@@ -173,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signOut(){
         FirebaseAuth.getInstance().signOut();
-    }
+    }//TODO utilize this
 
     private void startDefaultScreenActivity(){
         Intent intent = new Intent(this, DefaultScreenActivity.class);

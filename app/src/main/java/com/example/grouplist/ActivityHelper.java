@@ -4,20 +4,18 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.example.grouplist.Auth.AuthDecrypt;
-import com.example.grouplist.Auth.AuthEncrypt;
 import com.example.grouplist.Objects.ListObject;
 import com.example.grouplist.Objects.UserObject;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ActivityHelper {
 
     public static boolean verifyPasscode(String passcode, ArrayList<ListObject> listObjects){
         for(ListObject object : listObjects){
-            String decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode());
-            if(decryptedPasscode.equals(passcode)){
+            byte[] decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode().getBytes());
+            if(new String(decryptedPasscode).equals(passcode)){
                 return true;
             }
         }
@@ -26,8 +24,8 @@ public class ActivityHelper {
 
     public static String getNameFromPasscode(String passcode, ArrayList<ListObject> mAllLists){
         for(ListObject object : mAllLists){
-            String decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode());
-            if(decryptedPasscode.equals(passcode)){
+            byte[] decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode().getBytes());
+            if(new String(decryptedPasscode).equals(passcode)){
                 return object.getListName();
             }
         }
@@ -37,8 +35,8 @@ public class ActivityHelper {
     public static ListObject findList(String passcode, ArrayList<ListObject> listObjects){
         ListObject targList = null;
         for(ListObject object : listObjects){
-            String decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode());
-            if(decryptedPasscode.equals(passcode)){
+            byte[] decryptedPasscode = AuthDecrypt.decrypt(object.getEncryptedPasscode().getBytes());
+            if(new String(decryptedPasscode).equals(passcode)){
                 targList = object;
             }
         }

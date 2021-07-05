@@ -11,18 +11,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
-import com.example.grouplist.Objects.UserListObject;
+import com.example.grouplist.Objects.ListReferenceObject;
 
 import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter {
 
     private ArrayList<ListItem> mItemList;
-    private ArrayList<UserListObject> mUserLists;
+    private ArrayList<ListReferenceObject> mUserLists;
     private ArrayList<CompletedListItem> mCompletedListItem;
     private OnItemClickListener mListener;
 
-    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<UserListObject> userLists, ArrayList<CompletedListItem> completedListItems) {
+    public RecyclerAdapter(ArrayList<ListItem> itemList, ArrayList<ListReferenceObject> userLists, ArrayList<CompletedListItem> completedListItems) {
         mItemList = itemList;
         mUserLists = userLists;
         mCompletedListItem = completedListItems;
@@ -176,6 +176,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
                     if(listener != null){
                         int position = getAdapterPosition();
                         if(position != RecyclerView.NO_POSITION){
+
                             listener.onCompleteClick(position);
                         }
                     }

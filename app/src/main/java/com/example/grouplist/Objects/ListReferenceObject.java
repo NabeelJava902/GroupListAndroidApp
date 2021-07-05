@@ -1,14 +1,14 @@
 package com.example.grouplist.Objects;
 
-public class UserListObject {
+public class ListReferenceObject {
 
     private String listName;
     private String encryptedPasscode;
     private String firebaseID;
 
-    public UserListObject(){}
+    public ListReferenceObject(){}
 
-    public UserListObject(String listName, String encryptedPasscode, String firebaseID) {
+    public ListReferenceObject(String listName, String encryptedPasscode, String firebaseID) {
         this.listName = listName;
         this.encryptedPasscode = encryptedPasscode;
         this.firebaseID = firebaseID;

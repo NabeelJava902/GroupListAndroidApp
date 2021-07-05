@@ -11,9 +11,7 @@ import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
 
 import java.util.ArrayList;
-import static com.example.grouplist.ListActivity.addItem;
-import static com.example.grouplist.ListActivity.changeValue;
-import static com.example.grouplist.ListActivity.mCompletedList;
+import static com.example.grouplist.ListActivity.listManager;
 
 public class Popup {
 
@@ -24,10 +22,10 @@ public class Popup {
     private final Context mContext;
     private final View mPopup, mAssurePopup;
 
-    public Popup(Context context, View popup, View assurePopoup){
+    public Popup(Context context, View popup, View assurePopup){
         mContext = context;
         mPopup = popup;
-        mAssurePopup = assurePopoup;
+        mAssurePopup = assurePopup;
         setupItemDialog();
         setupAssureDialog();
     }
@@ -58,9 +56,9 @@ public class Popup {
     public void createAssureDialog(int position){
         assureDialog.show();
         yes_button.setOnClickListener(view -> {
-            CompletedListItem currentItem = mCompletedList.get(position);
-            mCompletedList.remove(currentItem);
-            addItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity());
+            CompletedListItem currentItem = listManager.getCompletedList().get(position);
+            listManager.getCurrentList().getCompletedListItems().remove(currentItem);
+            listManager.addItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity());
             assureDialog.dismiss();
         });
 
@@ -92,7 +90,7 @@ public class Popup {
                 }else{
                     quantityText = newpopup_quantity.getText().toString();
                 }
-                addItem(itemText, locationText, quantityText);
+                listManager.addItem(itemText, locationText, quantityText);
                 itemDialog.dismiss();
             }
         });
@@ -110,13 +108,13 @@ public class Popup {
             if(newpopup_itemName.getText().toString().equals("")){
                 ActivityHelper.makeToast("Enter an item name", mContext);
             }else{
-                changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
+                listManager.changeValue(position, ValueType.ITEM_NAME, newpopup_itemName.getText().toString());
             }
             if(!(newpopup_itemLocation.getText().toString().equals(""))){
-                changeValue(position, ValueType.ITEM_LOCATION, newpopup_itemLocation.getText().toString());
+                listManager.changeValue(position, ValueType.ITEM_LOCATION, newpopup_itemLocation.getText().toString());
             }
             if(!(newpopup_quantity.getText().toString().equals(""))){
-                changeValue(position, ValueType.ITEM_QUANTITY, newpopup_quantity.getText().toString());
+                listManager.changeValue(position, ValueType.ITEM_QUANTITY, newpopup_quantity.getText().toString());
             }
             itemDialog.dismiss();
         });

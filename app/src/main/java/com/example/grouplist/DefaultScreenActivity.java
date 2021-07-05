@@ -10,11 +10,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.grouplist.Auth.AuthConditional;
@@ -22,7 +20,7 @@ import com.example.grouplist.Auth.AuthEncrypt;
 import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.ListObject;
-import com.example.grouplist.Objects.UserListObject;
+import com.example.grouplist.Objects.ListReferenceObject;
 import com.example.grouplist.Objects.UserObject;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -30,7 +28,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 
@@ -100,10 +97,10 @@ public class DefaultScreenActivity extends AppCompatActivity {
         enterIDButton.setOnClickListener(view -> {
             String passcode = enterListPasscodeText.getText().toString();
             if(ActivityHelper.verifyPasscode(passcode, mAllLists)){
-                encryptedPasscode = AuthEncrypt.encrypt(passcode);
+                encryptedPasscode = new String(AuthEncrypt.encrypt(passcode));
                 ListObject currentList = ActivityHelper.findList(passcode, mAllLists);
                 if(!currentUser.hasJoinedGroup(currentList.getFireBaseID())){
-                    currentUser.addGroup(new UserListObject(ActivityHelper.getNameFromPasscode(passcode, mAllLists), encryptedPasscode, currentList.getFireBaseID()));
+                    currentUser.addGroup(new ListReferenceObject(ActivityHelper.getNameFromPasscode(passcode, mAllLists), encryptedPasscode, currentList.getFireBaseID()));
                     mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
                     openListActivity();
                 }else{
@@ -170,7 +167,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
                 if(newpopup_listName.getText().toString().equals("")){
                     ActivityHelper.makeToast("Enter a list name", getApplicationContext());
                 }else{
-                    encryptedPasscode = AuthEncrypt.encrypt(newpopup_passcode.getText().toString());
+                    encryptedPasscode = new String(AuthEncrypt.encrypt(newpopup_passcode.getText().toString()));
                     updateVariables(newpopup_listName.getText().toString(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
                     syncToFirebase();
                     openListActivity();
@@ -197,7 +194,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
         assert id != null;
         mListRef.child(id).setValue(list);
 
-        currentUser.addGroup(new UserListObject(listName, encryptedPasscode, id));
+        currentUser.addGroup(new ListReferenceObject(listName, encryptedPasscode, id));
         mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
     }
 

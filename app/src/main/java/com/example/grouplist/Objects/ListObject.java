@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class ListObject{
 
     private ArrayList<ListItem> items;
-    private ArrayList<CompletedListItem> completedListItems;
+    private ArrayList<CompletedListItem> completedListItems = new ArrayList<>();
     private String listName;
     private ArrayList<String> members;
     private String encryptedPasscode;

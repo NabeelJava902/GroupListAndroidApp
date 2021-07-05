@@ -1,15 +1,19 @@
 package com.example.grouplist.Auth;
 
+import android.annotation.SuppressLint;
+
+import javax.crypto.Cipher;
+
 public class AuthDecrypt {
 
-    public static String decrypt(String encryptedString){
-        String decryptedString;
-        char[] encryptedChars = encryptedString.toCharArray();
-        for(int i=0; i<encryptedString.length(); i++){
-            int value = encryptedString.length() + AuthEncrypt.key + i;
-            encryptedChars[i] -= value;
+    public static byte[] decrypt(byte[] encrypted) {
+        try {
+            @SuppressLint("GetInstance") Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, AuthEncrypt.aesKey);
+            return cipher.doFinal(encrypted);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        decryptedString = String.valueOf(encryptedChars);
-        return decryptedString;
+        return null;
     }
 }
