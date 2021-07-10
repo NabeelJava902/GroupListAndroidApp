@@ -12,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -47,7 +49,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
     public static String encryptedPasscode;//this string must always be updated before changing activity
 
     private DatabaseReference mListRef;
-    private DatabaseReference mUserRef;
+    public static DatabaseReference mUserRef;
 
     private ArrayList<ListItem> items;
     private ArrayList<CompletedListItem> completedListItems;
@@ -56,9 +58,9 @@ public class DefaultScreenActivity extends AppCompatActivity {
 
     private ArrayList<ListObject> mAllLists;
     private ArrayList<UserObject> mAllUsers;
-    private UserObject currentUser;
+    public static UserObject currentUser;
 
-    private RecyclerAdapter mAdapter;
+    public static RecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -73,10 +75,21 @@ public class DefaultScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_default);
 
         initiate();
-
-        readFromFirebase();
-
         configureButtons();
+
+        if(hasSetAdapter){
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        readFromFirebase();
+    }
+
+    private void animate(){
+
     }
 
     private void initiate(){
@@ -96,7 +109,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
     private void configureButtons(){
         enterNewListButton.setOnClickListener(view -> {
             createNewContactDialog();
-            //animation
+            ActivityHelper.bounceAnimation(DefaultScreenActivity.this, enterNewListButton);
         });
         enterIDButton.setOnClickListener(view -> {
             String passcode = enterListPasscodeText.getText().toString();
@@ -228,6 +241,7 @@ public class DefaultScreenActivity extends AppCompatActivity {
             mRecyclerView.setAdapter(mAdapter);
 
             mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onItemClick(int position) {
                     encryptedPasscode = currentUser.getGroups().get(position).getEncryptedPasscode();

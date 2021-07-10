@@ -1,25 +1,43 @@
 package com.example.grouplist;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
+import android.view.Menu;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.NonNull;
+import androidx.core.view.GravityCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.grouplist.databinding.ActivityListBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class ListActivity extends AppCompatActivity {
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+
+public class ListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private AppBarConfiguration mAppBarConfiguration;
 
     public static final DatabaseReference mListRef = FirebaseDatabase.getInstance().getReference("lists");
     private static final String TAG = "ListActivity";
@@ -30,13 +48,31 @@ public class ListActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     public static ListManager listManager;
 
+    private DrawerLayout drawer;
+
+    private Popup popup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
+
+        com.example.grouplist.databinding.ActivityListBinding binding = ActivityListBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.appBarTemporary.toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+
+        drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+        navigationView.setNavigationItemSelectedListener(this);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home)
+                .setDrawerLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_temporary);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
 
         initiate();
-        listManager.initiate();
 
         readFromFirebase();
 
@@ -109,12 +145,35 @@ public class ListActivity extends AppCompatActivity {
     private void configureButtons(){
         FloatingActionButton addItemButton = findViewById(R.id.addItemButton);
         addItemButton.setOnClickListener(view -> listManager.getPopup().createNewDialog());
+    }
 
-        ImageButton returnButton = findViewById(R.id.returnButton);
-        returnButton.setOnClickListener(view -> {
-            listManager.clearList();
-            listManager.notifyAdapter();
-            finish();
-        });
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_temporary);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
+        int id = item.getItemId();
+        item.setChecked(true);
+        drawer.closeDrawers();
+        switch(id){
+            case R.id.nav_delete:
+                listManager.deleteList(listManager.getCurrentList().getFireBaseID());
+                startDefaultActivity();
+                break;
+            case R.id.nav_leave:
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void startDefaultActivity(){
+        Intent intent = new Intent(this, DefaultScreenActivity.class);
+        startActivity(intent);
     }
 }

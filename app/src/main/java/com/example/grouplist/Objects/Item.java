@@ -1,5 +1,9 @@
 package com.example.grouplist.Objects;
 
+import javax.annotation.Nonnull;
+
+;
+
 public abstract class Item {
 
     private String mItemName, mLocation, mQuantity;
@@ -21,6 +25,7 @@ public abstract class Item {
         mItemName = itemName;
     }
 
+    @Nonnull
     public String getLocationName() {
         return mLocation;
     }

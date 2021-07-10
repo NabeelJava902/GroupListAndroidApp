@@ -12,7 +12,7 @@
         android:theme="@style/Theme.AppCompat.NoActionBar"
         tools:replace="android:theme">
         <activity android:name=".DefaultScreenActivity" />
-        <activity android:name=".ListActivity" />
+        <activity android:name=".ListActivity"/>
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -42,8 +42,9 @@ public class UserObject {
         groups.add(list);
     }
 
-    public void removeGroup(ListReferenceObject list){
-        groups.remove(list);
+    public void removeGroup(int position){
+        groups.remove(position);
+
     }
 
     public String getEmail() {

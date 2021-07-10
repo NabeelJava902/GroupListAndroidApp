@@ -1,5 +1,7 @@
 package com.example.grouplist.Auth;
 
+import android.os.Build;
+
 import com.example.grouplist.ActivityHelper;
 import com.example.grouplist.Objects.ListObject;
 
@@ -21,8 +23,10 @@ public class AuthVerifier {
             return AuthEnum.PASSCODE_TOO_SHORT;
         }else if(passcode.equals("")){
             return AuthEnum.NO_PASSCODE_ENTERED;
-        }else if(ActivityHelper.verifyPasscode(passcode, mAllLists)){
-            return AuthEnum.PASSCODE_EXISTS;
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if(ActivityHelper.verifyPasscode(passcode, mAllLists)){
+                return AuthEnum.PASSCODE_EXISTS;
+            }
         }
         return AuthEnum.PASSCODE_WORKS;
     }

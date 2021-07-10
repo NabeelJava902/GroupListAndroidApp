@@ -8,7 +8,11 @@ import com.example.grouplist.Objects.CompletedListItem;
 import com.example.grouplist.Objects.ListItem;
 import com.example.grouplist.Objects.ListObject;
 import com.google.firebase.database.DataSnapshot;
+
 import static com.example.grouplist.ListActivity.mListRef;
+import static com.example.grouplist.DefaultScreenActivity.mUserRef;
+import static com.example.grouplist.ActivityHelper.iterateRefOBJ;
+import static com.example.grouplist.DefaultScreenActivity.currentUser;
 
 import java.util.ArrayList;
 
@@ -35,6 +39,7 @@ public class ListManager {
         this.popupView = popupView;
         this.assureView = assureView;
         this.context = context;
+        initiate();
     }
 
     public void update(Iterable<DataSnapshot> dataSnapshots){
@@ -109,8 +114,12 @@ public class ListManager {
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
     }
 
-    public void clearList(){
-        mList.clear();
+    public void deleteList(String id){
+        currentList.clear();
+        mListRef.child(id).setValue(currentList);
+        int position = iterateRefOBJ(currentUser.getGroups(), id);
+        currentUser.removeGroup(position);
+        mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
     }
 
     public Popup getPopup(){

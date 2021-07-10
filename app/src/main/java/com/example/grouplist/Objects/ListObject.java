@@ -21,6 +21,15 @@ public class ListObject{
         this.encryptedPasscode = encryptedPasscode;
     }
 
+    public void clear(){
+        items = null;
+        completedListItems = null;
+        members = null;
+        listName = null;
+        encryptedPasscode = null;
+        fireBaseID = null;
+    }
+
     public ArrayList<ListItem> getItems() {
         return items;
     }

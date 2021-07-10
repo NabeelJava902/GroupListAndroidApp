@@ -42,7 +42,6 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private GoogleSignInOptions gso;
     private FirebaseAuth mAuth;
     public static FirebaseUser currentUser;
 
@@ -131,6 +130,7 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             ActivityHelper.makeToast("Failed to sign in", getApplicationContext());
+                            dialog.dismiss();
                             //updateUI, pass null
                         }
 
@@ -181,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void createRequest(){
-        gso = new GoogleSignInOptions
+        GoogleSignInOptions gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
