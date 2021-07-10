@@ -35,6 +35,8 @@ public class ListManager {
     private final View popupView, assureView;
     private final Context context;
 
+    private static final int ITEM_CAP = 10;
+
     public ListManager(Context context, View popupView, View assureView){
         this.popupView = popupView;
         this.assureView = assureView;
@@ -92,14 +94,22 @@ public class ListManager {
 
     public void removeItem(int position){
         ListItem currentItem = currentList.getItems().get(position);
-        mCompletedList.add(new CompletedListItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity()));
+        addCompletedItem(currentItem);
         currentList.getItems().remove(position);
-        currentList.getCompletedListItems().add(new CompletedListItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity()));
         mListRef.child(currentList.getFireBaseID()).setValue(currentList);
         if (currentList.getItems().isEmpty()){
             mList.clear();
             notifyAdapter();
         }
+    }
+
+    private void addCompletedItem(ListItem currentItem){
+        if(mCompletedList.size() >= ITEM_CAP){
+            mCompletedList.remove(mCompletedList.size()-1);
+            currentList.getCompletedListItems().remove(currentList.getCompletedListItems().size()-1);
+        }
+        mCompletedList.add(0, new CompletedListItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity()));
+        currentList.getCompletedListItems().add(0, new CompletedListItem(currentItem.getItemName(), currentItem.getLocationName(), currentItem.getQuantity()));
     }
 
     public void changeValue(int position, ValueType valueType, String string){
@@ -117,6 +127,12 @@ public class ListManager {
     public void deleteList(String id){
         currentList.clear();
         mListRef.child(id).setValue(currentList);
+        int position = iterateRefOBJ(currentUser.getGroups(), id);
+        currentUser.removeGroup(position);
+        mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);
+    }
+
+    public void removeUser(String id){
         int position = iterateRefOBJ(currentUser.getGroups(), id);
         currentUser.removeGroup(position);
         mUserRef.child(currentUser.getFirebaseID()).setValue(currentUser);

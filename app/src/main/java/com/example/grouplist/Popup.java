@@ -1,6 +1,7 @@
 package com.example.grouplist;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -51,6 +52,45 @@ public class Popup {
 
         assureDialogBuilder.setView(popupView);
         assureDialog = assureDialogBuilder.create();
+    }
+
+    public void createDeleteDialog(Context context){
+        assureDialog.show();
+        yes_button.setOnClickListener(view -> {
+            listManager.deleteList(listManager.getCurrentList().getFireBaseID());
+            finish(context);
+        });
+
+        no_button.setOnClickListener(view -> {
+            assureDialog.dismiss();
+            yes_button.setOnClickListener(null);
+            no_button.setOnClickListener(null);
+        });
+    }
+
+    public void createLeaveDialog(Context context){
+        assureDialog.show();
+        yes_button.setOnClickListener(view -> {
+            listManager.removeUser(listManager.getCurrentList().getFireBaseID());
+            finish(context);
+        });
+
+        no_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                assureDialog.dismiss();
+                yes_button.setOnClickListener(null);
+                no_button.setOnClickListener(null);
+            }
+        });
+    }
+
+    private void finish(Context context){
+        assureDialog.dismiss();
+        yes_button.setOnClickListener(null);
+        no_button.setOnClickListener(null);
+        Intent intent = new Intent(context, DefaultScreenActivity.class);
+        context.startActivity(intent);
     }
 
     public void createAssureDialog(int position){

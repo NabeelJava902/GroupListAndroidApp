@@ -50,8 +50,6 @@ public class ListActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout drawer;
 
-    private Popup popup;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,18 +160,14 @@ public class ListActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawers();
         switch(id){
             case R.id.nav_delete:
-                listManager.deleteList(listManager.getCurrentList().getFireBaseID());
-                startDefaultActivity();
+                listManager.getPopup().createDeleteDialog(this);
                 break;
             case R.id.nav_leave:
+                listManager.getPopup().createLeaveDialog(this);
+                break;
         }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private void startDefaultActivity(){
-        Intent intent = new Intent(this, DefaultScreenActivity.class);
-        startActivity(intent);
     }
 }
